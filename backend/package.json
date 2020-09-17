@@ -1,0 +1,47 @@
+{
+  "name": "footapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/loader.js",
+  "scripts": {
+    "dev": "nodemon",
+    "test": "cross-env NODE_ENV=test jest --coverage --detectOpenHandles --runInBand ./__tests__",
+    "production": "pm2 start src/loader.js --name footapp",
+    "start": "node src/loader.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@shelf/jest-mongodb": "^1.2.3",
+    "axios": "^0.19.2",
+    "bcrypt": "^3.0.6",
+    "body-parser": "^1.15.2",
+    "cross-env": "^7.0.2",
+    "express": "^4.14.0",
+    "express-query-int": "^1.0.1",
+    "jest": "^26.4.2",
+    "jsonwebtoken": "^7.3.0",
+    "lodash": "^4.17.4",
+    "mongodb-memory-server": "^6.6.7",
+    "mongoose": "^5.9.27",
+    "mongoose-paginate": "^5.0.3",
+    "node-mocks-http": "^1.9.0",
+    "node-restful": "^0.2.5",
+    "nodemailer": "^6.4.10",
+    "pm2": "^2.1.5",
+    "supertest": "^4.0.2",
+    "validar-cpf": "^2.1.2",
+    "xml2js": "^0.4.23"
+  },
+  "devDependencies": {
+    "nodemon": "^1.11.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "modulePaths": [
+      "<rootDir>/node_modules",
+      "<rootDir>/src"
+    ]
+  }
+}

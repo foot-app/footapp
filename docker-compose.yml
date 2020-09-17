@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+    db:
+        image: mongo
+        ports:
+            - '27017:27017'
+        volumes:
+            - ./data:/data/db
+    backend:
+        build: 
+            context: ./backend
+            dockerfile: Dockerfile
+        ports:
+            - '3003:3003'
+        expose:
+            - 3003
+        depends_on:
+            - db
+        container_name: 'footapp-backend'
+        volumes: 
+            - ./backend:/backend
+            - /backend/node_modules
+    frontend:
+        build: 
+            context: ./frontend
+            dockerfile: Dockerfile
+        ports:
+            - '8081:8081'
+        expose:
+            - 8081
+        container_name: 'footapp-frontend'
+        volumes:
+            - ./frontend:/frontend
+            - /frontend/node_modules
