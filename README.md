@@ -1,6 +1,6 @@
 # Footapp
 
-## Autors
+## Authors
 * Anderson Pereira Barbosa
 * Higor Moles Lima
 * Leonardo Giraldi Moreno Giuranno
