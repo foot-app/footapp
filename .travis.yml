@@ -1,0 +1,10 @@
+service: docker
+
+before_script:
+    - docker-compose build
+    - docker-compose up
+
+script:
+    - cd ./backend
+    - npm run test
+
