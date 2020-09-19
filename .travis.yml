@@ -13,7 +13,9 @@ before_script:
 
 script:
     - cd ./backend
+    - npm install
     - npm run test
     - cd ..
     - cd ./frontend
+    - npm install
     - npm run end-to-end-test
