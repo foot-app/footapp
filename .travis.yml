@@ -1,7 +1,7 @@
 language: node_js
 
 node_js:
-    - node
+    - "node"
 
 services: 
     - docker
@@ -14,9 +14,9 @@ before_script:
 
 script:
     - cd ./backend
-    - sudo npm install
-    - sudo npm run test
+    - npm install
+    - npm run test
     - cd ..
     - cd ./frontend
-    - sudo npm install
-    - sudo npm run end-to-end-test
+    - npm install
+    - npm run end-to-end-test
