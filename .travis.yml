@@ -4,10 +4,10 @@ node_js:
     - node
 
 services: 
-    - mongodb
     - docker
 
 before_script:
+    - docker-compose build
     - docker-compose up -d db frontend-test backend-test
 
 script:
