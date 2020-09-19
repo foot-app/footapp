@@ -7,6 +7,7 @@ services:
     - docker
 
 before_script:
+    - npm install --global cross-env
     - docker-compose build
     - docker-compose up -d db frontend-test backend-test
 
