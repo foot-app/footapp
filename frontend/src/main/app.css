@@ -1,0 +1,5 @@
+html, body { background-color: black; height: 100%; }
+#app { height: 100%; }
+[data-reactroot] { height: 100%; }
+.auth-container { height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+.auth-container form { width: 100% }

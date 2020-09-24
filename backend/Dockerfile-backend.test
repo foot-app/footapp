@@ -1,0 +1,9 @@
+FROM node:10.19.0
+RUN mkdir -p /backend
+WORKDIR /backend
+COPY package.json /backend
+RUN npm install
+COPY . /backend
+ENV MONGOLAB_URI=mongodb://db:27017/footapp_test
+ENV AUTH_SECRET=ae10f818c2dbf0e3eb2ea3ac4cc4d37dd938ec6fbaf8b1e217c6735bb996b978
+CMD ["npm", "run", "dev"]

@@ -1,0 +1,28 @@
+language: node_js
+
+node_js:
+    - "node"
+
+services: 
+    - docker
+
+sudo: required
+
+env:
+    MONGOLAB_URI=mongodb://db:27017/footapp_test
+    AUTH_SECRET=ae10f818c2dbf0e3eb2ea3ac4cc4d37dd938ec6fbaf8b1e217c6735bb996b978
+
+before_script:
+    - docker-compose build
+    - docker-compose up -d db frontend-test backend-test
+
+script:
+    - cd ./backend
+    - sudo chown -R $USER node_modules
+    - npm install
+    - npm run test
+    - cd ..
+    - cd ./frontend
+    - sudo chown -R $USER node_modules
+    - npm install
+    - npm run end-to-end-test

@@ -4,3 +4,4 @@ import 'modules/bootstrap/dist/css/bootstrap.min.css'
 import 'modules/bootstrap/dist/js/bootstrap.min.js'
 
 import '../../main/app.css'
+import '../../auth/auth.css'

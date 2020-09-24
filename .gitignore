@@ -4,3 +4,4 @@ node_modules
 dockerEnv.list
 data
 coverage
+frontend/cypress/videos
