@@ -4,6 +4,8 @@ import { Router, Route, IndexRoute, Redirect, hashHistory } from 'react-router'
 import AuthOrApp from './authOrApp'
 import App from './app'
 import Home from '../home/home'
+import ResetPassword from '../resetPassword/resetPassword'
+import NewPassword from '../newPassword/newPassword'
 
 export default props => (
     <Router history={hashHistory}>
@@ -12,6 +14,8 @@ export default props => (
             <IndexRoute component={Home} />
             <Route path='/home' component={Home} />
         </Route>
+        <Route path='/reset-password' component={ResetPassword} />
+        <Route path='/reset-password/:token/changePassword' component={NewPassword} />
         <Redirect from='*' to='/' />
     </Router>
 )

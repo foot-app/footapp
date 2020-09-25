@@ -6,4 +6,5 @@ RUN npm install
 COPY . /backend
 ENV MONGOLAB_URI=mongodb://db:27017/footapp_test
 ENV AUTH_SECRET=ae10f818c2dbf0e3eb2ea3ac4cc4d37dd938ec6fbaf8b1e217c6735bb996b978
+ENV RESET_PASSWORD_DOMAIN_URL=http://localhost:8081/#
 CMD ["npm", "run", "dev"]
