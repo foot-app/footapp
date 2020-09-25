@@ -6,7 +6,7 @@ const _ = require('lodash')
 const User = require('../user/user');
 
 const passwordRegex = /((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!]).{6,20})/
-const env = process.env.RESET_PASSWORD_EMAIL ? null : require('../../.env')
+const env = process.env.RESET_PASSWORD_DOMAIN_URL ? null : require('../../.env')
 
 const sendResetPasswordEmail = (req, res, next) => {
     const email = req.body.email; 
