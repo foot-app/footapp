@@ -19,7 +19,10 @@ module.exports = function (server) {
 	server.use('/oapi', openApi)
 
 	const AuthService = require('../api/user/authService')
+	const ResetPassword = require('../api/resetPassword/resetPassword')
 	openApi.post('/user/login', AuthService.login)
 	openApi.post('/user/signup', AuthService.signup)
 	openApi.post('/user/validateToken', AuthService.validateToken)
+	openApi.post('/resetPassword/sendEmail', ResetPassword.sendResetPasswordEmail)
+	openApi.post('/resetPassword/changePassword', ResetPassword.changePassword)
 }

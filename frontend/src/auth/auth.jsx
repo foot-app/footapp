@@ -52,6 +52,13 @@ class Auth extends Component {
                                 </a>
                             </Grid>
                         </div>
+                        <div className="form-group">
+                            <Grid cols='12 4' offset='0 4' className='text-center'>
+                                {loginMode &&
+                                    <Link to='/reset-password'>Esqueceu sua senha?</Link>
+                                }
+                            </Grid>
+                        </div>
                     </form>
                     <Messages />
                 </div>

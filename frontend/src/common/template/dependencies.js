@@ -5,3 +5,5 @@ import 'modules/bootstrap/dist/js/bootstrap.min.js'
 
 import '../../main/app.css'
 import '../../auth/auth.css'
+import '../../resetPassword/resetPassword.css'
+import '../../newPassword/newPassword.css'
