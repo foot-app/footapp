@@ -1,5 +1,7 @@
 # Footapp
 
+[![Build Status](https://travis-ci.com/foot-app/footapp.svg?branch=main)](https://travis-ci.com/foot-app/footapp)
+
 ## Authors
 * Anderson Pereira Barbosa - 8980899
 * Higor Moles Lima - 10284500
