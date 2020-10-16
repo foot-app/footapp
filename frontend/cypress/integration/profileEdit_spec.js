@@ -45,8 +45,8 @@ describe('ProfileEdit components tests', () => {
 
     it ('update successfully', () => {
         fillProfileUpdateFormCorrectly()
-        cy.wait(1000)
         cy.get('[data-test-id="submit-button"]').click()
+        cy.wait(1000)
         cy.get('[data-test-id="name"]').contains('Foo Foolish Foo')
         cy.get('[data-test-id="nickname"]').contains('foo1234')
         cy.get('[data-test-id="physical-data"]').contains('170')
