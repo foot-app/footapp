@@ -55,3 +55,9 @@ export function validateToken(token) {
         }
     }
 }
+
+export function changeLoggedUserInfo(userInfoObj) {
+    return dispatch => {
+        dispatch({ type: 'USER_FETCHED', payload: userInfoObj })
+    }
+}

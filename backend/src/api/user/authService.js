@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt')
 const User = require('./user')
 const env = process.env.AUTH_SECRET ? null : require('../../.env')
 const { sendErrorsFromDB } = require('../common/sendErrorsFromDb')
+const user = require('./user')
 
 const emailRegex = /\S+@\S+\.\S+/
 const passwordRegex = /((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!]).{6,20})/
@@ -17,8 +18,8 @@ const login = (req, res, next) => {
             const token = jwt.sign(user, process.env.AUTH_SECRET ? process.env.AUTH_SECRET : env.authSecret, {
                 expiresIn: "1 day"
             })
-            const { name, email } = user
-            return res.status(200).send({ name, email, token })
+            const { name, email, nickname } = user
+            return res.status(200).send({ name, email, token, nickname })
         } else {
             return res.status(400).send({
                 errors: ['Usuário/Senha inválidos']
@@ -37,9 +38,10 @@ const validateToken = (req, res, next) => {
     })
 }
 
-const signup = (req, res, next) => {
+const signup = async (req, res, next) => {
     const name = req.body.name || ''
     const email = req.body.email || ''
+    const nickname = req.body.nickname || ''
     const password = req.body.password || ''
     const confirmPassword = req.body.confirm_password || ''
 
@@ -56,18 +58,36 @@ const signup = (req, res, next) => {
         return res.status(400).send({ errors: ['Senhas não conferem.'] })
     }
 
-    User.findOne({ email }, (err, user) => {
+    User.findOne({ nickname }, (err, user) => {
         if (err) {
             return sendErrorsFromDB(res, err)
-        } else if (user) {
+        }
+        else if (user) {
             return res.status(400).send({ errors: ['Usuário já cadastrado.'] })
-        } else {
-            const newUser = new User({ name, email, password: passwordHash })
-            newUser.save(err => {
+        }
+        else {
+            User.findOne({ email }, (err, user) => {
                 if (err) {
                     return sendErrorsFromDB(res, err)
+                } else if (user) {
+                    return res.status(400).send({ errors: ['Usuário já cadastrado.'] })
                 } else {
-                    login(req, res, next)
+                    User.findOne({ nickname }, (err, user) => {
+                        if (err) {
+                            return sendErrorsFromDB(res, err)
+                        } else if (user) {
+                            return res.status(400).send({ errors: ['Usuário já cadastrado.'] })
+                        } else {
+                            const newUser = new User({ name, email, nickname, password: passwordHash })
+                            newUser.save(err => {
+                                if (err) {
+                                    return sendErrorsFromDB(res, err)
+                                } else {
+                                    login(req, res, next)
+                                }
+                            })
+                        }
+                    })
                 }
             })
         }

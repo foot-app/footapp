@@ -6,6 +6,8 @@ import App from './app'
 import Home from '../home/home'
 import ResetPassword from '../resetPassword/resetPassword'
 import NewPassword from '../newPassword/newPassword'
+import Profile from '../profile/profile'
+import ProfileEdit from '../profile/profileEdit'
 
 export default props => (
     <Router history={hashHistory}>
@@ -13,6 +15,8 @@ export default props => (
             <Route path='/' component={App} />
             <IndexRoute component={Home} />
             <Route path='/home' component={Home} />
+            <Route path='/profile' component={Profile} />
+            <Route path='/profile/edit' component={ProfileEdit} />
         </Route>
         <Route path='/reset-password' component={ResetPassword} />
         <Route path='/reset-password/:token/changePassword' component={NewPassword} />

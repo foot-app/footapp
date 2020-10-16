@@ -1,5 +1,7 @@
 import React from 'react'
 
 export default props => (
-    <h1>Home</h1>
+    <div id='home-content'>
+        <h1>Home</h1>
+    </div>
 )

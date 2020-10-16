@@ -11,6 +11,10 @@ module.exports = function (server) {
 	*/
 	
 	server.use('/api', protectedApi)
+
+	const User = require('../api/user/userService')
+	protectedApi.get('/user/:nickname', User.getUserByNickname)
+	protectedApi.put('/user/:nickname', User.updateUser)
 	
 	/*
 	* Rotas abertas
@@ -19,10 +23,11 @@ module.exports = function (server) {
 	server.use('/oapi', openApi)
 
 	const AuthService = require('../api/user/authService')
-	const ResetPassword = require('../api/resetPassword/resetPassword')
 	openApi.post('/user/login', AuthService.login)
 	openApi.post('/user/signup', AuthService.signup)
 	openApi.post('/user/validateToken', AuthService.validateToken)
+	
+	const ResetPassword = require('../api/resetPassword/resetPassword')
 	openApi.post('/resetPassword/sendEmail', ResetPassword.sendResetPasswordEmail)
 	openApi.post('/resetPassword/changePassword', ResetPassword.changePassword)
 }
