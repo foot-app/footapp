@@ -1,0 +1,14 @@
+#profile-content, #profileEdit-content { margin-top: 90px; }
+#profile-content .record-data-section #name-row { color: #ccc; font-size: 26px; }
+#profile-content .record-data-section #nickname-row { color: #b1f900; font-size: 24px; }
+#profile-content .record-data-section #nickname-row #best-know-as-span { color: #ccc; font-size: 18px; }
+#profile-content .physical-characteristics-section #physical-row { color: #ccc; font-size: 20px; }
+#profile-content #button-row button { margin: 5px; }
+
+#profileEdit-content h2 { color: #ccc; }
+#profileEdit-content input, #profileEdit-content select { background-color: #15202b !important ; border-top: 0; border-right: 0; border-left: 0; color: #ccc; }
+
+#profileEdit-form label { color: #ccc; }
+#profileEdit-form fieldset { border: solid 1px #b1f900; padding: 30px; }
+#profileEdit-form legend { color: #b1f900; width: 200px; }
+#profileEdit-form button { margin: 10px; }

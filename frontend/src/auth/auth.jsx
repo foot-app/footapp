@@ -29,9 +29,11 @@ class Auth extends Component {
                 <div className='container auth-container'>
                     <form role='form' onSubmit={handleSubmit(v => this.onSubmit(v))}>
                         <Field component={Input} type="input" name="name" 
-                            dataTestId='name' className='auth-input' placeholder="Nome" hide={loginMode} />
+                            dataTestId='name' className='auth-input' placeholder="Nome completo" hide={loginMode} />
                         <Field component={Input} type="email" name="email"
                             dataTestId='email' className='auth-input' placeholder="E-mail" />
+                        <Field component={Input} type="input" name="nickname"
+                            dataTestId='nickname' className='auth-input' placeholder="Nome de usuário" hide={loginMode} />
                         <Field component={Input} type="password" name="password"
                             dataTestId='password' className='auth-input' placeholder="Senha" />
                         <Field component={Input} type="password" name="confirm_password"
