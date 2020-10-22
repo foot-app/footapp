@@ -2,29 +2,45 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt')
 const _ = require('lodash')
+const moment = require('moment')
 
 const User = require('../user/user');
+const ResetPasswordRequisition = require('./resetPasswordRequisition');
 
+const emailRegex = /\S+@\S+\.\S+/
 const passwordRegex = /((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!]).{6,20})/
 const env = process.env.RESET_PASSWORD_DOMAIN_URL ? null : require('../../.env')
 
 const sendResetPasswordEmail = (req, res, next) => {
-    const email = req.body.email; 
-    if(email === '') {
+    const email = req.body.email;
+    const startDateTs = moment().unix();
+    const endDateTs = moment(new Date()).add(1, 'days').unix();
+
+    if(!email) {
         return res.status(400).send({ errors: ['O preenchimento do e-mail é obrigatório. Por favor, preencha essa informação']});
     }
 
-    User.findOne({email}, (err, user) => {
-        if(err) {
+    if(!email.match(emailRegex)) {
+        return res.status(400).send({ errors: ['O e-mail informado está inválido'] });
+    }
+
+    User.findOne({ email }, (err, user) => {
+        if (err) {
             return sendErrorsFromDB(res, err);
-        } else if(user) {
+        } else if (user) {
             const token = crypto.randomBytes(20).toString('hex');
-            User.findOneAndUpdate({email}, {resetPasswordToken: token, resetPasswordExpires: Date.now() + 3600000}, {new: true} , (err, user) => {
+            const newResetPasswordRequisition = new ResetPasswordRequisition({
+                token: token,
+                email: email,
+                startDateTs: startDateTs, 
+                endDateTs: endDateTs
+            });
+
+            newResetPasswordRequisition.save(err => {
                 if(err) {
                     return sendErrorsFromDB(res, err);
                 }
-                else if(user) {
-
+                else {
                     const transporter = nodemailer.createTransport({
                         service: 'gmail',
                         auth: {
@@ -50,7 +66,7 @@ const sendResetPasswordEmail = (req, res, next) => {
                         }
                     })
                 }
-            })
+            });
         } else {
             return res.status(400).send({errors: ['Usuário não encontrado!']})
         }
@@ -58,9 +74,10 @@ const sendResetPasswordEmail = (req, res, next) => {
 }
 
 const changePassword = (req, res, next) => {
-    const token = req.body.token;
-    const password = req.body.password;
-    const confirmationPassword = req.body.confirmationPassword;
+    const token = req.body.token || '';
+    const password = req.body.password || '';
+    const confirmationPassword = req.body.confirmationPassword || '';
+    const todayTs = moment().unix();
 
     const salt = bcrypt.genSaltSync();
     const passwordHash = bcrypt.hashSync(password, salt);
@@ -73,15 +90,36 @@ const changePassword = (req, res, next) => {
         return res.status(400).send({ errors: ['Senhas não conferem.'] })
     }
 
-     
-    User.findOneAndUpdate({ resetPasswordToken: token }, { password: passwordHash, resetPasswordToken: '', resetPasswordExpires: 0 }, (err, user) => {
-        if (err) {
-            return sendErrorsFromDB(res, err)
+    ResetPasswordRequisition.findOne({ token }, (err, resetPasswordRequisition) => {
+        if( err ) {
+            return sendErrorsFromDB(res, err);
+        } 
+        else if (resetPasswordRequisition) {
+            const startDateTs = resetPasswordRequisition.startDateTs
+            const endDateTs = resetPasswordRequisition.endDateTs
+            const email = resetPasswordRequisition.email;
+            const id = resetPasswordRequisition._id;
+
+            if(todayTs >= startDateTs && todayTs <= endDateTs) {
+                User.findOneAndUpdate({ email }, { password: passwordHash }, (err, user) => {
+                    if (err) {
+                        return sendErrorsFromDB(res, err)
+                    }
+                    else if (user) {
+                        ResetPasswordRequisition.deleteOne({ _id: id }, (err, resetPasswordRequisitionDeleted) => {
+                            return res.status(200).send({response: 'Senha alterada com sucesso!'})
+                        })
+                    }
+                })
+            }
+            else {
+                return res.status(400).send({ errors: ['Solicitação expirada.'] })
+            }
+        } 
+        else {
+            return res.status(400).send({errors: ['Token inválido!']})
         }
-        else if (user) {
-            return res.status(200).send({response: 'Senha alterada com sucesso!'})
-        }
-    })
+    });
 }
 
 const sendErrorsFromDB = (res, dbErrors) => {
