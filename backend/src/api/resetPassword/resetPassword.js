@@ -60,7 +60,7 @@ const sendResetPasswordEmail = (req, res, next) => {
 
                     transporter.sendMail(mailOptions, (err, response) => {
                         if(err) {
-                            return res.status(400).send({ errors: ['Ocorreu um erro durante o envio de seu e-mail. Tentar novamente mais tarde.', `Descrição técnica: ${error}`] })
+                            return res.status(400).send({ errors: ['Ocorreu um erro durante o envio de seu e-mail. Tentar novamente mais tarde.', `Descrição técnica: ${err}`] })
                         } else {
                             res.status(200).send('e-mail enviado com sucesso');
                         }
