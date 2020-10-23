@@ -104,9 +104,8 @@ describe('reset password routes test', () => {
 
     describe('send reset password e-mail tests', () => {
         it ('can send e-mail', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
+            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
+            await user.save()
             await request(server).post('/oapi/resetPassword/sendEmail')
                 .send({ email: 'foo@foo.com'})
                 .expect(200)
