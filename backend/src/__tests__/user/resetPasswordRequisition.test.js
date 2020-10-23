@@ -3,7 +3,6 @@ const request = require('supertest')
 const ResetPasswordRequisition = require('../../api/resetPassword/resetPasswordRequisition')
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const server = require('../../loader');
-const crypto = require('crypto');
 const moment = require('moment');
 const User = require('../../api/user/user');
 let app
@@ -40,7 +39,7 @@ describe('reset password requisition model test', () => {
 
     describe('get reset password requisition', () => {
         it('gets a reset password requisition', async () => {
-            const token = crypto.randomBytes(20).toString('hex');
+            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
             const startDateTs = moment().unix();
             const endDateTs = moment(new Date()).add(1, 'days').unix();
 
@@ -56,7 +55,7 @@ describe('reset password requisition model test', () => {
 
     describe('save reset password requisition', () => {
         it('saves a reset password requisition', async () => {
-            const token = crypto.randomBytes(20).toString('hex');
+            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
             const startDateTs = moment().unix();
             const endDateTs = moment(new Date()).add(1, 'days').unix();
 
@@ -70,7 +69,7 @@ describe('reset password requisition model test', () => {
 
     describe('update reset password requisition', () => {
         it('updates a reset password requisition', async () => {
-            const token = crypto.randomBytes(20).toString('hex');
+            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
             const startDateTs = moment().unix();
             const endDateTs = moment(new Date()).add(1, 'days').unix();
             const resetPasswordRequisition = new ResetPasswordRequisition({ email: 'foo@foo.com', token, startDateTs, endDateTs});
@@ -156,7 +155,7 @@ describe('reset password routes test', () => {
             const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
             await user.save()
 
-            const token = crypto.randomBytes(20).toString('hex');
+            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
             const startDateTs = moment().unix();
             const endDateTs = moment(new Date()).add(1, 'days').unix();
 
@@ -172,7 +171,7 @@ describe('reset password routes test', () => {
             const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
             await user.save()
 
-            const token = crypto.randomBytes(20).toString('hex');
+            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
             const startDateTs = moment().unix();
             const endDateTs = moment(new Date()).add(1, 'days').unix();
 
@@ -201,7 +200,7 @@ describe('reset password routes test', () => {
         });
 
         it('can\t change password - token não encontrado', async() => {
-            const token = crypto.randomBytes(20).toString('hex');
+            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
             const startDateTs = moment().unix();
             const endDateTs = moment(new Date()).add(1, 'days').unix();
 
@@ -217,7 +216,7 @@ describe('reset password routes test', () => {
             const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
             await user.save()
 
-            const token = crypto.randomBytes(20).toString('hex');
+            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
             const startDateTs = moment().add(1, 'days').unix();
             const endDateTs = moment(new Date()).add(2, 'days').unix();
 
@@ -233,7 +232,7 @@ describe('reset password routes test', () => {
             const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
             await user.save()
 
-            const token = crypto.randomBytes(20).toString('hex');
+            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
             const startDateTs = moment().unix();
             const endDateTs = moment(new Date()).subtract(2, 'days').unix();
 
@@ -249,7 +248,7 @@ describe('reset password routes test', () => {
             const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
             await user.save()
 
-            const token = crypto.randomBytes(20).toString('hex');
+            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
             const startDateTs = moment().unix();
             const endDateTs = moment(new Date()).subtract(2, 'days').unix();
 
