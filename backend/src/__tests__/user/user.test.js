@@ -37,7 +37,7 @@ describe('user model test', () => {
 
     describe('get user', () => {
         it('gets a user', async () => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
+            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
             await user.save()
 
             const foundUser = await User.findOne({ email: 'foo@foo.com'})
@@ -49,7 +49,7 @@ describe('user model test', () => {
 
     describe('save user', () => {
         it('saves a user', async () => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
+            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
             const savedUser = await user.save()
             const expected = 'foo'
             const actual = savedUser.name
@@ -59,7 +59,7 @@ describe('user model test', () => {
 
     describe('update user', () => {
         it('updates a user', async () => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
+            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
             await user.save()
 
             user.name = 'bar'
@@ -72,7 +72,7 @@ describe('user model test', () => {
     })
 })
 
-describe('user routes test', () => {
+describe('user routes tests', () => {
     beforeAll(async () => {
         app = await server.listen(3001)
         await User.deleteMany({})
@@ -285,13 +285,16 @@ describe('user routes test', () => {
                 })
             await request(server).put('/api/user/foo123')
                 .set('authorization', token)
-                .send({ height: 170, weight: 70, preferredFoot: 'Direito' })
+                .send({ height: 170, weight: 70, preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
                 .expect(200)
             await request(server).get('/api/user/foo123')
                 .set('authorization', token)
                 .expect(200)
                 .then(response => {
                     expect(response.body.userData.height).toEqual(170)
+                    expect(response.body.userData.weight).toEqual(70)
+                    expect(response.body.userData.preferredFoot).toEqual('Direito')
+                    expect(response.body.userData.profilePicture).toEqual('https://foo.com.br/image.png')
                 })
         })
 
@@ -307,7 +310,7 @@ describe('user routes test', () => {
                 })
             await request(server).put('/api/user/foo1234')
                 .set('authorization', token)
-                .send({ height: 170, weight: 70, preferredFoot: 'Direito' })
+                .send({ height: 170, weight: 70, preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
                 .expect(400)
         })
 
@@ -319,7 +322,7 @@ describe('user routes test', () => {
                 .send({ name: 'foo', email: 'foo1234@foo.com', nickname: 'foo1234', password: 'Foo@123!', confirm_password: 'Foo@123!' })
                 .expect(200)
             await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123!' })
+                .send({ email: 'foo@foo.com', password: 'Foo@123!', profilePicture: 'https://foo.com.br/image.png' })
                 .expect(200)
                 .then(response => {
                     token = response.body.token

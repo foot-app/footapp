@@ -7,6 +7,7 @@ import { getUserByNickname } from './profileActions'
 import { changeLoggedUserInfo } from '../auth/authActions'
 import Grid from '../common/layout/grid'
 import Row from '../common/layout/row'
+import If from '../common/operator/if'
 import { Link } from 'react-router'
 
 class Profile extends Component {
@@ -28,7 +29,7 @@ class Profile extends Component {
                 this.props.changeLoggedUserInfo(userInfoLocalStorage)
             }
 
-            this.props.getUserByNickname(userNickname)
+            this.props.getUserByNickname(userNickname, false, true)
         }
     }
 
@@ -36,6 +37,16 @@ class Profile extends Component {
         return (
             <div id='profile-content' className='container'>
                 <section className='record-data-section'>
+                    <If test={this.props.profile.userInfo.profilePicture}>
+                        <Row id='profilePicture-row'>
+                            <Grid cols='12' className='text-center'>
+                                <p>
+                                    <img src={this.props.profile.userInfo.profilePicture || ''} alt={this.props.profile.userInfo.name || ''}
+                                    data-test-id='profilePicture' />
+                                </p>
+                            </Grid>
+                        </Row>
+                    </If>
                     <Row id='name-row'>
                         <Grid cols='12' className='text-center'>
                             <p data-test-id='name'>{this.props.profile.userInfo.name || ''}</p>

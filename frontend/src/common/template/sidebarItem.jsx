@@ -9,7 +9,7 @@ class SidebarItem extends Component {
 
     render() {
         return (
-            <div onClick={() => this.closeSidebarAndRedirect()}>
+            <div onClick={() => this.props.action ? this.props.action() : this.closeSidebarAndRedirect()}>
                 <i className={this.props.icon}></i> {this.props.name}
             </div>
         )

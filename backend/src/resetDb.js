@@ -9,10 +9,8 @@ mongoose.connect(conStr, {
     useUnifiedTopology: true,
   })
   .then((con) => {
-
     User.deleteMany({}, (err) => {
         mongoose.disconnect()
     })
-
 })
 

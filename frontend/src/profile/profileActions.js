@@ -2,6 +2,7 @@ import axios from 'axios'
 import { toastr } from 'react-redux-toastr'
 import consts from '../consts'
 import { reset as resetForm, initialize, updateSyncErrors } from 'redux-form'
+import { storage } from '../firebase/firebaseConfig'
 
 export const init = values => {
     return [
@@ -27,7 +28,7 @@ export const update = (values, nickname) => {
     }
 }
 
-export const getUserByNickname = (nickname, callback) => {
+export const getUserByNickname = (nickname, callback, setUserInfo) => {
     return dispatch => {
         axios.get(`${consts.API_URL}/user/${nickname}`)
             .then(response => {
@@ -35,7 +36,8 @@ export const getUserByNickname = (nickname, callback) => {
                     if (callback) {
                         callback(response.data.userData)
                     }
-                    else {
+
+                    if (setUserInfo) {
                         dispatch({ type: 'SET_USER_INFO', payload: response.data.userData})
                     }
                 }
