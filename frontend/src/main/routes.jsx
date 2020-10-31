@@ -8,6 +8,8 @@ import ResetPassword from '../resetPassword/resetPassword'
 import NewPassword from '../newPassword/newPassword'
 import Profile from '../profile/profile'
 import ProfileEdit from '../profile/profileEdit'
+import Matches from '../matches/matches'
+import MatchCreate from '../matches/matchCreate'
 
 export default props => (
     <Router history={hashHistory}>
@@ -17,6 +19,8 @@ export default props => (
             <Route path='/home' component={Home} />
             <Route path='/profile' component={Profile} />
             <Route path='/profile/edit' component={ProfileEdit} />
+            <Route path='/matches' component={Matches} />
+            <Route path='/match/create' component={MatchCreate} />
         </Route>
         <Route path='/reset-password' component={ResetPassword} />
         <Route path='/reset-password/:token/changePassword' component={NewPassword} />

@@ -15,6 +15,9 @@ module.exports = function (server) {
 	const User = require('../api/user/userService')
 	protectedApi.get('/user/:nickname', User.getUserByNickname)
 	protectedApi.put('/user/:nickname', User.updateUser)
+
+	const Match = require('../api/match/matchService');
+	protectedApi.put('/match/create', Match.createMatch)
 	
 	/*
 	* Rotas abertas
