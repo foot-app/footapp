@@ -31,6 +31,7 @@ export function logout() {
         payload: false
     }
 }
+
 export function validateToken(token) {
     return dispatch => {
         if (token) {

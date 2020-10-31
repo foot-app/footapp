@@ -1,6 +1,5 @@
 const _ = require('lodash')
 const User = require('./user')
-const bcrypt = require('bcrypt')
 
 const sendErrorsFromDB = (res, dbErrors) => {
     const errors = []
@@ -34,7 +33,8 @@ const getUserByNickname = (req, res, next) => {
                 nickname: user.nickname,
                 height: user.height,
                 weight: user.weight,
-                preferredFoot: user.preferredFoot
+                preferredFoot: user.preferredFoot,
+                profilePicture: user.profilePicture
             }
             return res.status(200).json({ userData })
         }

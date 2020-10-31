@@ -8,7 +8,8 @@
     "test": "cross-env NODE_ENV=test jest --coverage --detectOpenHandles --runInBand ./__tests__",
     "production": "pm2 start src/loader.js --name footapp",
     "start": "node src/loader.js",
-    "db:reset": "node src/resetDb.js"
+    "db:reset": "node src/resetDb.js",
+    "db:migrate": "node src/migrations/migrationsCentral.js &"
   },
   "keywords": [],
   "author": "",
