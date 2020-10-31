@@ -23,7 +23,7 @@ class ProfileEdit extends Component {
         }
         else {
             const userNickname = authUser.nickname
-            this.props.getUserByNickname(userNickname, this.props.init)
+            this.props.getUserByNickname(userNickname, this.props.init, true)
         }
     }
 

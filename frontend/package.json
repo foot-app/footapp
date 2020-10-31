@@ -26,6 +26,7 @@
     "babel-preset-react": "6.22.0",
     "css-loader": "0.26.1",
     "cypress": "^5.2.0",
+    "cypress-file-upload": "^4.1.1",
     "extract-text-webpack-plugin": "1.0.1",
     "file-loader": "0.9.0",
     "font-awesome": "4.7.0",
@@ -50,6 +51,7 @@
   },
   "dependencies": {
     "bootstrap": "^4.4.1",
+    "firebase": "^7.24.0",
     "http-server": "0.10.0",
     "jquery": "^3.5.1",
     "live-server": "^1.2.1",

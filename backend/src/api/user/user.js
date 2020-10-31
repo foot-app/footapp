@@ -6,11 +6,10 @@ const userSchema = new mongoose.Schema({
     email: { type: String, required: true },
     nickname: { type: String, required: true },
     password: { type: String, min: 6, max: 12, required: true },
-    resetPasswordToken: { type: String },
-    resetPasswordExpires: { type: Number },
     height: { type: Number, min: 1 },
     weight: { type: Number, min: 1 },
-    preferredFoot: { type: String, enum: ['Direito', 'Esquerdo', 'Ambos'] }
+    preferredFoot: { type: String, enum: ['Direito', 'Esquerdo', 'Ambos'] },
+    profilePicture: { type: String }
 })
 
 module.exports = restful.model('User', userSchema)
