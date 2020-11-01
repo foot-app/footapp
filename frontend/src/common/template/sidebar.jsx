@@ -10,6 +10,7 @@ class Sidebar extends Component {
         return (
             <div id="menu-sidebar" className="sidenav" data-state='closed'>
                 <SidebarItem path='/profile' icon='fa fa-user' name='Perfil' />
+                <SidebarItem path='/matches' icon='fa fa-play-circle' name='Partidas' />
                 <SidebarItem icon='fa fa-sign-out' name='Sair' action={() => this.props.logout()} />
             </div>
         )
