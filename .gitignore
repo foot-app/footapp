@@ -5,3 +5,5 @@ dockerEnv.list
 data
 coverage
 frontend/cypress/videos
+.idea
+maintainability.html
