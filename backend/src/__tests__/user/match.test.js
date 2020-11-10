@@ -1,11 +1,12 @@
-const mongoose = require('mongoose')
+const utils = require('../utils')
+
 const request = require('supertest')
 const Match = require('../../api/match/match')
 const User = require('../../api/user/user')
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const server = require('../../loader');
+const server = require('../../loader')
 let app
-var mongoServer
+
+const fakeMatch = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' }
 
 const createUserAndLogin = () => {
     return new Promise(async resolve => {
@@ -31,20 +32,19 @@ const sendCreateMatchRequisition = (token, bodyRequisition) => {
     })
 }
 
-beforeAll(async () => {
-    mongoServer = new MongoMemoryServer();
-    const URI = await mongoServer.getUri();
+const createFailMatch = async (match) => {
+    const token  = await createUserAndLogin();
+    const bodyRequisition = match
+    const res = await sendCreateMatchRequisition(token, bodyRequisition)
+    expect(res.status).toEqual(400)
+}
 
-    mongoose.connect(URI, {
-        useNewUrlParser: true,
-        useCreateIndex: true,
-        useUnifiedTopology: true,
-    })
+beforeAll(async () => {
+    await utils.connectMongoInMemory()
 })
 
 afterAll(async done => {
-    mongoose.disconnect(done);
-    await mongoServer.stop();
+    await utils.disconnectMongoose(done)
 })
 
 describe('match model test', () => {
@@ -63,7 +63,7 @@ describe('match model test', () => {
 
     describe('get match', () => {
         it('gets a match', async () => {
-            const match = new Match({ name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' })
+            const match = new Match(fakeMatch)
             await match.save()
 
             const foundMatch = await Match.findOne({ ownerNickname: 'nickteste'})
@@ -75,7 +75,7 @@ describe('match model test', () => {
 
     describe('save match', () => {
         it('saves a user', async () => {
-            const match = new Match({ name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' })
+            const match = new Match(fakeMatch)
             const savedMatch = await match.save();
             const expected = 'nickteste'
             const actual = savedMatch.ownerNickname
@@ -85,7 +85,7 @@ describe('match model test', () => {
        
     describe('update match', () => {
         it('update a match', async () => {
-            const match = new Match({ name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' })
+            const match = new Match(fakeMatch)
             await match.save();
             match.name = 'partidaTesteChange'
             const updatedMatch = await match.save();
@@ -99,13 +99,12 @@ describe('match model test', () => {
 
 describe('match routes test', () => {
     beforeAll(async () => {
-        app = await server.listen(3001)
-        await Match.deleteMany({})
-        await User.deleteMany({})
+        await utils.startServer()
+        await utils.resetDB([Match, User])
     })
 
     afterAll(async done => {
-        app.close(done)
+        utils.closeServer(done)
     })
 
     afterEach(async () => {
@@ -122,52 +121,45 @@ describe('match routes test', () => {
         })
 
         it('can\'t create match - name not included', async() => {
-            const token  = await createUserAndLogin();
-            const bodyRequisition = { name: '', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' }
-            const res = await sendCreateMatchRequisition(token, bodyRequisition)
-            expect(res.status).toEqual(400)
+            const matchWithoutName = fakeMatch
+            matchWithoutName.name = ''
+            await createFailMatch(matchWithoutName)
         })
 
         it('can\'t create match - street not included', async() => {
-            const token  = await createUserAndLogin();
-            const bodyRequisition = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: '', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' }
-            const res = await sendCreateMatchRequisition(token, bodyRequisition)
-            expect(res.status).toEqual(400)
+            const matchWithoutName = fakeMatch
+            matchWithoutName.street = ''
+            await createFailMatch(matchWithoutName)
         })
 
         it('can\'t create match - number not included', async() => {
-            const token  = await createUserAndLogin();
-            const bodyRequisition = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' }
-            const res = await sendCreateMatchRequisition(token, bodyRequisition)
-            expect(res.status).toEqual(400)
+            const matchWithoutName = fakeMatch
+            matchWithoutName.number = ''
+            await createFailMatch(matchWithoutName)
         })
 
         it('can\'t create match - neighborhood not included', async() => {
-            const token  = await createUserAndLogin();
-            const bodyRequisition = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: '', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' }
-            const res = await sendCreateMatchRequisition(token, bodyRequisition)
-            expect(res.status).toEqual(400)
+            const matchWithoutName = fakeMatch
+            matchWithoutName.neighborhood = ''
+            await createFailMatch(matchWithoutName)
         })
 
         it('can\'t create match - city not included', async() => {
-            const token  = await createUserAndLogin();
-            const bodyRequisition = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'a', city: '', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' }
-            const res = await sendCreateMatchRequisition(token, bodyRequisition)
-            expect(res.status).toEqual(400)
+            const matchWithoutName = fakeMatch
+            matchWithoutName.city = ''
+            await createFailMatch(matchWithoutName)
         })
 
         it('can\'t create match - state not included', async() => {
-            const token  = await createUserAndLogin();
-            const bodyRequisition = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'a', city: 'a', state: '', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' }
-            const res = await sendCreateMatchRequisition(token, bodyRequisition)
-            expect(res.status).toEqual(400)
+            const matchWithoutName = fakeMatch
+            matchWithoutName.state = ''
+            await createFailMatch(matchWithoutName)
         })
 
         it('can\'t create match - date not included', async() => {
-            const token  = await createUserAndLogin();
-            const bodyRequisition = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'a', city: 'a', state: 'a', date: null, ownerNickname: 'nickteste' }
-            const res = await sendCreateMatchRequisition(token, bodyRequisition)
-            expect(res.status).toEqual(400)
+            const matchWithoutName = fakeMatch
+            matchWithoutName.date = ''
+            await createFailMatch(matchWithoutName)
         })
 
         it('can\'t create match - wrong format date', async() => {

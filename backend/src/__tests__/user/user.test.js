@@ -1,25 +1,16 @@
-const mongoose = require('mongoose')
+const utils = require('../utils')
+
 const request = require('supertest')
 const User = require('../../api/user/user')
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const server = require('../../loader');
+const server = require('../../loader')
 let app
-var mongoServer
 
 beforeAll(async () => {
-    mongoServer = new MongoMemoryServer();
-    const URI = await mongoServer.getUri();
-
-    mongoose.connect(URI, {
-        useNewUrlParser: true,
-        useCreateIndex: true,
-        useUnifiedTopology: true,
-    })
+    await utils.connectMongoInMemory()
 })
 
 afterAll(async done => {
-    mongoose.disconnect(done);
-    await mongoServer.stop();
+    await utils.disconnectMongoose(done)
 })
 
 describe('user model test', () => {
@@ -74,12 +65,12 @@ describe('user model test', () => {
 
 describe('user routes tests', () => {
     beforeAll(async () => {
-        app = await server.listen(3001)
-        await User.deleteMany({})
+        await utils.startServer()
+        await utils.resetDB([User])
     })
 
     afterAll(async done => {
-        app.close(done)
+        utils.closeServer(done)
     })
 
     afterEach(async () => {

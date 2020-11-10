@@ -1,27 +1,42 @@
-const mongoose = require('mongoose')
+const utils = require('../utils')
+
 const request = require('supertest')
 const ResetPasswordRequisition = require('../../api/resetPassword/resetPasswordRequisition')
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const server = require('../../loader');
-const moment = require('moment');
-const User = require('../../api/user/user');
+const server = require('../../loader')
+const moment = require('moment')
+const User = require('../../api/user/user')
 let app
-var mongoServer
+
+const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' }
+
+const changePassword = async (statusCode, startAmount, endAmount, email) => {
+    const user = new User(fakeUser)
+    await user.save()
+
+    const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
+    const startDateTs = endAmount ? moment().add(endAmount, 'days').unix() : moment().unix();
+    const endDateTs = moment(new Date()).add(startAmount ? startAmount : 1, 'days').unix();
+
+    const resetPasswordRequisition = new ResetPasswordRequisition({ email: email ? email : fakeUser.email, token, startDateTs, endDateTs});
+    await resetPasswordRequisition.save();
+
+    await request(server).post('/oapi/resetPassword/changePassword')
+        .send({ token, password: 'Bar@123', confirmationPassword: 'Bar@123' })
+        .expect(statusCode ? statusCode : 200)
+}
+
+const canNotChangePassword = async (token, password, confirmationPassword) => {
+    await request(server).post('/oapi/resetPassword/changePassword')
+        .send({ token, password, confirmationPassword })
+        .expect(400)
+}
  
 beforeAll(async () => {
-    mongoServer = new MongoMemoryServer();
-    const URI = await mongoServer.getUri();
-
-    mongoose.connect(URI, {
-        useNewUrlParser: true,
-        useCreateIndex: true,
-        useUnifiedTopology: true,
-    })
+    await utils.connectMongoInMemory()
 })
 
 afterAll(async done => {
-    mongoose.disconnect(done);
-    await mongoServer.stop();
+    await utils.disconnectMongoose(done)
 })
 
 describe('reset password requisition model test', () => {
@@ -87,13 +102,12 @@ describe('reset password requisition model test', () => {
 
 describe('reset password routes test', () => {
     beforeAll(async () => {
-        app = await server.listen(3001)
-        await User.deleteMany({})
-        await ResetPasswordRequisition.deleteMany({})
+        await utils.startServer()
+        await utils.resetDB([ResetPasswordRequisition, User])
     })
 
     afterAll(async done => {
-        app.close(done)
+        utils.closeServer(done)
     })
 
     afterEach(async () => {
@@ -101,9 +115,15 @@ describe('reset password routes test', () => {
         await User.deleteMany({})
     })
 
+    const sendEmail = async (email, statusCode) => {
+        await request(server).post('/oapi/resetPassword/sendEmail')
+            .send({ email: email})
+            .expect(statusCode)
+    }
+
     describe('send reset password e-mail tests', () => {
         it ('can send e-mail', async () => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
+            const user = new User(fakeUser)
             await user.save()
             await request(server).post('/oapi/resetPassword/sendEmail')
                 .send({ email: 'foo@foo.com'})
@@ -111,33 +131,23 @@ describe('reset password routes test', () => {
         });
 
         it ('can\t send e-mail - e-mail não preenchido (string vazia)', async () => {
-            await request(server).post('/oapi/resetPassword/sendEmail')
-                .send({ email: ''})
-                .expect(400)
+            await sendEmail('', 400)
         });
 
         it ('can\t send e-mail - e-mail não preenchido (request sem requisition body)', async () => {
-            await request(server).post('/oapi/resetPassword/sendEmail')
-                .send()
-                .expect(400)
+            await sendEmail(null, 400)
         });
 
         it ('can\t send e-mail - e-mail inválido (sem arroba)', async () => {
-            await request(server).post('/oapi/resetPassword/sendEmail')
-                .send({ email: 'foofoo.com'})
-                .expect(400)
+            await sendEmail('foofoo.com', 400)
         });
 
         it ('can\t send e-mail - e-mail inválido (sem ponto)', async () => {
-            await request(server).post('/oapi/resetPassword/sendEmail')
-                .send({ email: 'foo@foocom'})
-                .expect(400)
+            await sendEmail('foo@foocom', 400)
         });
 
         it ('can\t send e-mail - e-mail inválido (sem domínio de topo)', async () => {
-            await request(server).post('/oapi/resetPassword/sendEmail')
-                .send({ email: 'foo@foo.'})
-                .expect(400)
+            await sendEmail('foo@foo.', 400)
         });
 
         it ('can\t send e-mail - e-mail não encontrado', async () => {
@@ -152,35 +162,11 @@ describe('reset password routes test', () => {
 
     describe('change password tests', () => {
         it('can change password', async() => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
-            await user.save()
-
-            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
-            const startDateTs = moment().unix();
-            const endDateTs = moment(new Date()).add(1, 'days').unix();
-
-            const resetPasswordRequisition = new ResetPasswordRequisition({ email: 'foo@foo.com', token, startDateTs, endDateTs});
-            await resetPasswordRequisition.save();
-
-            await request(server).post('/oapi/resetPassword/changePassword')
-                .send({ token, password: 'Bar@123', confirmationPassword: 'Bar@123', })
-                .expect(200)
+            await changePassword()
         });
 
         it('can change password and signin with new password', async() => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
-            await user.save()
-
-            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
-            const startDateTs = moment().unix();
-            const endDateTs = moment(new Date()).add(1, 'days').unix();
-
-            const resetPasswordRequisition = new ResetPasswordRequisition({ email: 'foo@foo.com', token, startDateTs, endDateTs});
-            await resetPasswordRequisition.save();
-
-            await request(server).post('/oapi/resetPassword/changePassword')
-                .send({ token, password: 'Bar@123', confirmationPassword: 'Bar@123', })
-                .expect(200)
+            await changePassword()
 
             await request(server).post('/oapi/user/login')
                 .send({ email: 'foo@foo.com', password: 'Bar@123' })
@@ -188,15 +174,11 @@ describe('reset password routes test', () => {
         });
 
         it('can\t change password - invalid password', async() => {
-            await request(server).post('/oapi/resetPassword/changePassword')
-                .send({ token: 'token!123', password: 'a', confirmationPassword: 'a', })
-                .expect(400)
+            await canNotChangePassword('token!123', 'a', 'a')
         });
 
         it('can\t change password - password and confirmation password don´t match', async() => {
-            await request(server).post('/oapi/resetPassword/changePassword')
-                .send({ token: 'token!123', password: 'Foo!123', confirmationPassword: 'Bar!123', })
-                .expect(400)
+            await canNotChangePassword('token!123', 'Foo!123', 'Bar!123')
         });
 
         it('can\t change password - token não encontrado', async() => {
@@ -207,57 +189,19 @@ describe('reset password routes test', () => {
             const resetPasswordRequisition = new ResetPasswordRequisition({ email: 'foo@foo.com', token, startDateTs, endDateTs});
             await resetPasswordRequisition.save();
 
-            await request(server).post('/oapi/resetPassword/changePassword')
-                .send({ token: 'token!123', password: 'Foo!123', confirmationPassword: 'Foo!123', })
-                .expect(400)
+            await canNotChangePassword('token!123', 'Foo!123', 'Foo!123')
         });
 
         it('can\t change password - data atual menor que data de começo', async() => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
-            await user.save()
-
-            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
-            const startDateTs = moment().add(1, 'days').unix();
-            const endDateTs = moment(new Date()).add(2, 'days').unix();
-
-            const resetPasswordRequisition = new ResetPasswordRequisition({ email: 'foo@foo.com', token, startDateTs, endDateTs});
-            await resetPasswordRequisition.save();
-
-            await request(server).post('/oapi/resetPassword/changePassword')
-                .send({ token, password: 'Bar@123', confirmationPassword: 'Bar@123', })
-                .expect(400)
+            changePassword(400, 1, 2, 'foo@foo.com')
         });
 
         it('can\t change password - data atual maior que data de fim', async() => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
-            await user.save()
-
-            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
-            const startDateTs = moment().unix();
-            const endDateTs = moment(new Date()).subtract(2, 'days').unix();
-
-            const resetPasswordRequisition = new ResetPasswordRequisition({ email: 'foo@foo.com', token, startDateTs, endDateTs});
-            await resetPasswordRequisition.save();
-
-            await request(server).post('/oapi/resetPassword/changePassword')
-                .send({ token, password: 'Bar@123', confirmationPassword: 'Bar@123', })
-                .expect(400)
+            changePassword(400, null, 2, 'foo@foo.com')
         });
 
         it('can\t change password - usuário não encontrado', async() => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito' })
-            await user.save()
-
-            const token = '5daf9950556a4e9d921a163912e318bbc4083f4c'
-            const startDateTs = moment().unix();
-            const endDateTs = moment(new Date()).subtract(2, 'days').unix();
-
-            const resetPasswordRequisition = new ResetPasswordRequisition({ email: 'bar@bar.com', token, startDateTs, endDateTs});
-            await resetPasswordRequisition.save();
-
-            await request(server).post('/oapi/resetPassword/changePassword')
-                .send({ token, password: 'Bar@123', confirmationPassword: 'Bar@123', })
-                .expect(400)
+            changePassword(400, null, 2, 'bar@bar.com')
         });
     });
 });
