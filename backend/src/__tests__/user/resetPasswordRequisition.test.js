@@ -193,15 +193,15 @@ describe('reset password routes test', () => {
         });
 
         it('can\t change password - data atual menor que data de começo', async() => {
-            changePassword(400, 1, 2, 'foo@foo.com')
+            await changePassword(400, 1, 2, 'foo@foo.com')
         });
 
         it('can\t change password - data atual maior que data de fim', async() => {
-            changePassword(400, null, 2, 'foo@foo.com')
+            await changePassword(400, null, 2, 'foo@foo.com')
         });
 
         it('can\t change password - usuário não encontrado', async() => {
-            changePassword(400, null, 2, 'bar@bar.com')
+            await changePassword(400, null, 2, 'bar@bar.com')
         });
     });
 });
