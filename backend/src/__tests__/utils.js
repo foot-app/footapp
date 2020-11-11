@@ -34,4 +34,45 @@ const resetDB = async models => {
     })
 }
 
-module.exports = { connectMongoInMemory, disconnectMongoose, startServer, resetDB, closeServer }
+const getModel = async (Model, fakeObj, getSearchKeyAttribute, getSearchKeyValue, getExpectedAttribute, getExpectedValue) => {
+    const instance = new Model(fakeObj)
+    await instance.save()
+
+    const searchKey = {}
+    searchKey[getSearchKeyAttribute] = getSearchKeyValue
+    const foundModel = await Model.findOne(searchKey)
+    const expected = getExpectedValue
+    const actual = foundModel[getExpectedAttribute]
+    expect(actual).toEqual(expected)
+}
+
+const saveModel = async (Model, fakeObj, saveExpectedAttribute, saveExpectedValue) => {
+    const model = new Model(fakeObj)
+    const savedModel = await model.save()
+    const expected = saveExpectedValue
+    const actual = savedModel[saveExpectedAttribute]
+    expect(actual).toEqual(expected)
+}
+
+const updateModel = async (Model, fakeObj, updateAttribute, updateAttributeNewValue) => {
+    const model = new Model(fakeObj)
+    await model.save()
+
+    model[updateAttribute] = updateAttributeNewValue
+    const updatedUser = await model.save()
+
+    const expected = updateAttributeNewValue
+    const actual = updatedUser[updateAttribute]
+    expect(actual).toEqual(expected)
+}
+
+module.exports = {
+    connectMongoInMemory,
+    disconnectMongoose,
+    startServer,
+    resetDB,
+    closeServer,
+    getModel,
+    saveModel,
+    updateModel
+}

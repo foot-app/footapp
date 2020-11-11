@@ -63,36 +63,19 @@ describe('match model test', () => {
 
     describe('get match', () => {
         it('gets a match', async () => {
-            const match = new Match(fakeMatch)
-            await match.save()
-
-            const foundMatch = await Match.findOne({ ownerNickname: 'nickteste'})
-            const expected = 'nickteste'
-            const actual = foundMatch.ownerNickname
-            expect(actual).toEqual(expected)
+            await utils.getModel(Match, fakeMatch, 'ownerNickname', 'nickteste', 'ownerNickname', 'nickteste')
         })
     })
 
     describe('save match', () => {
         it('saves a user', async () => {
-            const match = new Match(fakeMatch)
-            const savedMatch = await match.save();
-            const expected = 'nickteste'
-            const actual = savedMatch.ownerNickname
-            expect(actual).toEqual(expected)
+            await utils.saveModel(Match, fakeMatch, 'ownerNickname', 'nickteste')
         })
     })
        
     describe('update match', () => {
         it('update a match', async () => {
-            const match = new Match(fakeMatch)
-            await match.save();
-            match.name = 'partidaTesteChange'
-            const updatedMatch = await match.save();
-
-            const expected = 'partidaTesteChange'
-            const actual = match.name
-            expect(actual).toEqual(expected)
+            await utils.updateModel(Match, fakeMatch, 'name', 'partidaTesteChange')
         })
     })
 })
