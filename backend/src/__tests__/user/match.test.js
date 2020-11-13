@@ -1,5 +1,4 @@
 const utils = require('../utils')
-
 const request = require('supertest')
 const Match = require('../../api/match/match')
 const User = require('../../api/user/user')
@@ -7,12 +6,11 @@ const server = require('../../loader')
 let app
 
 const fakeMatch = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' }
+const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' }
 
 const createUserAndLogin = () => {
     return new Promise(async resolve => {
-        await request(server).post('/oapi/user/signup')
-            .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-            .expect(200)
+        await utils.signUp(200, fakeUser)
         await request(server).post('/oapi/user/login')
             .send({ email: 'foo@foo.com', password: 'Foo@123!' })
             .expect(200)

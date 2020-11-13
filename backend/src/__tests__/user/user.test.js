@@ -1,23 +1,11 @@
 const utils = require('../utils')
-
 const request = require('supertest')
 const User = require('../../api/user/user')
 const server = require('../../loader')
 let app
 
 const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' }
-
 const fakeUserSignup = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' }
-
-const signUp = async (statusCode, userObj, attributeToChangeKey, attributeToChangeValue) => {
-    if (attributeToChangeKey != null && attributeToChangeValue != null && attributeToChangeKey != undefined && attributeToChangeValue != undefined) {
-        userObj[attributeToChangeKey] = attributeToChangeValue
-    }
-
-    await request(server).post('/oapi/user/signup')
-        .send(userObj)
-        .expect(statusCode)
-}
 
 const login = async (email, password, statusCode) => {
     await request(server).post('/oapi/user/login')
@@ -28,7 +16,7 @@ const login = async (email, password, statusCode) => {
 const multipleSignup = async (arrayUsers, arrayStatusCode) => {
     let statusCodeIndex = 0
     await arrayUsers.forEach(async user => {
-        await signUp(arrayStatusCode[statusCodeIndex], user)
+        await utils.signUp(arrayStatusCode[statusCodeIndex], user)
         statusCodeIndex++
     })
 }
@@ -47,10 +35,15 @@ const cantGetUserByAttribute = async (fakeUser, statusCode, searchKey) => {
 }
 
 const autoSignupAndLogin = async (fakeUser) => {
-    await signUp(200, fakeUser)
+    await utils.signUp(200, fakeUser)
     return await request(server).post('/oapi/user/login')
         .send({ email: fakeUser.email, password: fakeUser.password })
         .expect(200)
+}
+
+const signupWithInvalidData = async (statusCode, attributeToChangeKey, attributeToChangeValue) => {
+    const copyFakeUserSignup = Object.assign({}, fakeUserSignup)
+    await utils.signUp(statusCode, copyFakeUserSignup, attributeToChangeKey, attributeToChangeValue)
 }
 
 beforeAll(async () => {
@@ -109,7 +102,7 @@ describe('user routes tests', () => {
 
     describe('user login tests', () => {
         it ('can login', async () => {
-            await signUp(200, fakeUserSignup)
+            await utils.signUp(200, fakeUserSignup)
             await login('foo@foo.com', 'Foo@123!', 200)
         })
 
@@ -118,24 +111,24 @@ describe('user routes tests', () => {
         })
 
         it ('can\'t login - wrong password', async () => {
-            await signUp(200, fakeUserSignup)
+            await utils.signUp(200, fakeUserSignup)
             await login('foo@foo.com', 'Foo@123', 400)
         })
 
         it ('can\'t login - wrong email', async () => {
-            await signUp(200, fakeUserSignup)
+            await utils.signUp(200, fakeUserSignup)
             await login('foo@foo.co', 'Foo@123!', 400)
         })
 
         it ('can\'t login - wrong email and password', async () => {
-            await signUp(200, fakeUserSignup)
+            await utils.signUp(200, fakeUserSignup)
             await login('foo@foo.co', 'Foo@123', 400)
         })
     })
 
     describe('user signup tests', () => {
         it ('can signup', async () => {
-            await signUp(200, fakeUserSignup)
+            await utils.signUp(200, fakeUserSignup)
         })
 
         it ('can\'t signup - user already registered - email', async () => {
@@ -147,23 +140,19 @@ describe('user routes tests', () => {
         })
 
         it ('can\'t signup - invalid email', async () => {
-            const copyFakeUserSignup = Object.assign({}, fakeUserSignup)
-            await signUp(400, copyFakeUserSignup, 'email', 'foofoo.com')
+            await signupWithInvalidData(400, 'email', 'foofoo.com')
         })
 
         it ('can\'t signup - invalid password', async () => {
-            const copyFakeUserSignup = Object.assign({}, fakeUserSignup)
-            await signUp(400, copyFakeUserSignup, 'password', 'foo')
+            await signupWithInvalidData(400, 'password', 'foo')
         })
 
         it ('can\'t signup - passwords fields don\'t match', async () => {
-            const copyFakeUserSignup = Object.assign({}, fakeUserSignup)
-            await signUp(400, copyFakeUserSignup, 'confirm_password', 'Foo@123')
+            await signupWithInvalidData(400, 'confirm_password', 'Foo@123')
         })
 
         it ('can\'t signup - no nickname', async () => {
-            const copyFakeUserSignup = Object.assign({}, fakeUserSignup)
-            await signUp(400, copyFakeUserSignup, 'nickname', '')
+            await signupWithInvalidData(400, 'nickname', '')
         })
     })
 
@@ -238,13 +227,13 @@ describe('user routes tests', () => {
         })
 
         it ('can\'t updateUser - nickname already in use', async () => {
-            await signUp(200, fakeUserSignup)
+            await utils.signUp(200, fakeUserSignup)
 
             const secondUser = Object.assign({}, fakeUserSignup)
             secondUser.email = 'foo1234@foo.com'
             secondUser.nickname = 'foo1234'
 
-            await signUp(200, secondUser)
+            await utils.signUp(200, secondUser)
             await request(server).post('/oapi/user/login')
                 .send({ email: 'foo@foo.com', password: 'Foo@123!', profilePicture: 'https://foo.com.br/image.png' })
                 .expect(200)
