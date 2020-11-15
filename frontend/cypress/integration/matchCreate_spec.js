@@ -68,7 +68,6 @@ describe('MatchCreate components tests', () => {
         cy.wait(500)
         cy.url().should('eq', 'http://localhost:8081/#/matches')
         cy.get('[data-test-id="createMatchButton"]').should('exist')
-        cy.get('[data-test-id="table_item_1"]').should('exist')
     })
 
     it('can\'t create match successfully - name not included', () => {
