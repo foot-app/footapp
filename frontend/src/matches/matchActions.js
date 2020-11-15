@@ -30,6 +30,22 @@ export const create = (values) => {
     }
 }
 
+export const loadMyMatches = () => {
+    const userKey = '_footapp'
+    const userInfoLocalStorage = JSON.parse(localStorage.getItem(userKey));
+    const ownerNickname = userInfoLocalStorage.nickname;
+
+    return dispatch => {
+        axios.get(`${consts.API_URL}/matches/${ownerNickname}`)
+            .then(response => {
+                dispatch({ type: 'SET_MY_MATCHES', payload: [...response.data]})
+            })
+            .catch(e => {
+                e.response.data.errors.forEach(error => toastr.error('Erro', error))
+            })
+    }
+}
+
 export const resetForm = (formValues) => {
     return dispatch => {
         dispatch(reset('createMatchForm'))

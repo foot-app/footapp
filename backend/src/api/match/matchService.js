@@ -51,6 +51,20 @@ const createMatch = (req, res, next) => {
     })
 }
 
+const listMyMatches = async (req, res, next) => {
+    await Match.find({ownerNickname: req.params.nickname}, (err, matches) => {
+        if(err) {
+            return sendErrorsFromDB(res, err)
+        } 
+        else if(matches) {
+            return res.status(200).json(matches)
+        }
+        else {
+            return res.status(200).json([])
+        }
+    })
+}
+
 
 const sendErrorsFromDB = (res, dbErrors) => {
     const errors = []
@@ -61,4 +75,4 @@ const sendErrorsFromDB = (res, dbErrors) => {
     })
 }
 
-module.exports = { createMatch }
+module.exports = { createMatch, listMyMatches }
