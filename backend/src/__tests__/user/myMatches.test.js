@@ -94,10 +94,10 @@ describe('my match routes test', () => {
                     expect(response.body).toEqual(
                         expect.arrayContaining([
                             expect.objectContaining({
-                                name: 'partidaTeste', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: 1, neighborhood: 'b', city: 'c', state: 'c', date: "2020-12-12T22:30:00.000Z", ownerNickname: 'foo123'
+                                name: 'partidaTeste', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: 1, neighborhood: 'b', city: 'c', state: 'c', ownerNickname: 'foo123'
                             }),
                             expect.objectContaining({
-                                name: 'partidaTeste2', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: 1, neighborhood: 'b', city: 'c', state: 'c', date: "2020-12-12T22:30:00.000Z", ownerNickname: 'foo123'
+                                name: 'partidaTeste2', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: 1, neighborhood: 'b', city: 'c', state: 'c', ownerNickname: 'foo123'
                             })
                         ])
                     )
