@@ -5,6 +5,7 @@ import axios from 'axios'
 import Grid from '../common/layout/grid'
 import Messages from '../common/msg/messages'
 import consts from '../consts'
+import InputNewPassword from '../common/form/inputNewPassword'
 
 class NewPassword extends Component {
     constructor(props) {
@@ -41,6 +42,10 @@ class NewPassword extends Component {
     }
 
     render() {
+        const renderInputs = () => {
+
+        }
+
         return (
             <div>
                 <div className='container new-password-container'>
@@ -48,12 +53,12 @@ class NewPassword extends Component {
                         <div className='form-group'>
                             <h1>Nova senha</h1>
                         </div>
-                        <div className='form-group'>
-                            <input type='password' className='new-password-input' placeholder='Nova senha' onChange={this.handlePasswordChange} value={this.state.password}/>
-                        </div>
-                        <div className='form-group'>
-                            <input type='password' className='new-password-input' placeholder='Confirmar senha' onChange={this.handleConfirmationPasswordChange} value={this.state.confirmationPassword}/>
-                        </div>
+                        <InputNewPassword placeholder='Nova senha'
+                            onChange={this.handlePasswordChange} 
+                            value={this.state.password}/>
+                        <InputNewPassword placeholder='Confirmar senha'
+                            onChange={this.handleConfirmationPasswordChange} 
+                            value={this.state.confirmationPassword}/>
                         <div className='form-group'>
                             <Grid cols='12 4' offset='0 4'>
                                 <button type='submit' className='new-password-btn'>Enviar</button>

@@ -7,3 +7,4 @@ coverage
 frontend/cypress/videos
 .idea
 maintainability.html
+frontend/cypress/screenshots
