@@ -25,7 +25,7 @@ checks:
       threshold: 4
   similar-code:
     config:
-      threshold: # language-specific defaults. an override will affect all languages.
+      threshold: 
   identical-code:
     config:
-      threshold: # language-specific defaults. an override will affect all languages.
+      threshold: 

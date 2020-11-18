@@ -7,9 +7,7 @@ const createMatch = async (req, res, next) => {
     const changesObj = {}
     const propertiesName = Object.getOwnPropertyNames(req.body)
     const requiredFields = ['name', 'street', 'number', 'neighborhood', 'city', 'state', 'date']
-    const mapRequiredFields = {
-        name: 'nome', street: 'rua', number: 'número', neighborhood: 'bairro', city: 'cidade', state: 'estado', date: 'data e horário'
-    }
+    const mapRequiredFields = { name: 'nome', street: 'rua', number: 'número', neighborhood: 'bairro', city: 'cidade', state: 'estado', date: 'data e horário' }
 
     await changesObjUtils.populateChangesObj(propertiesName, changesObj, ['schedule'], req)
 
