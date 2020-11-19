@@ -1,13 +1,14 @@
 const User = require('../api/user/user')
+const utils = require('./migrationsUtils')
 
 const addProfilePictureField = async () => {
 	console.log('> addProfilePictureField')
 	await User.find({ profilePicture: { $exists: false } }, (error, user) => {
 		if (error) {
-			throw(error)
+			throw error
 		}
 		else if (user) {
-			user.forEach(userObj => {
+			user.forEach(async userObj => {
 				const newUser = new User({ 
 					name: userObj.name || null,
 					email: userObj.email || null ,
@@ -22,21 +23,7 @@ const addProfilePictureField = async () => {
 					_id: userObj._id
 				})
 	
-				User.remove({ _id: userObj._id }, (error) => {
-					if (error) {
-						throw(error)
-				  	}  
-				  	else {
-						newUser.save(error => {
-							if (error) {
-								throw(error)
-							}
-							else {
-								console.log(`>> User ${newUser._id} migrated`)
-							}
-						})
-					}
-				})
+				await utils.updateModel(User, userObj, newUser, 'User')
 			})
 		}
 		else {
@@ -49,10 +36,10 @@ const addNicknameField = async () => {
 	console.log('> addNicknameField')
 	await User.find({ nickname: { $exists: false } }, (error, user) => {
 		if (error) {
-			throw(error)
+			throw error
 		}
 		else if (user) {
-			user.forEach(userObj => {
+			user.forEach(async userObj => {
 				const newUser = new User({ 
 					name: userObj.name || null,
 					email: userObj.email || null ,
@@ -67,21 +54,7 @@ const addNicknameField = async () => {
 					_id: userObj._id
 				})
 	
-				User.remove({ _id: userObj._id }, (error) => {
-					if (error) {
-						throw(error)
-				  	}  
-				  	else {
-						newUser.save(error => {
-							if (error) {
-								throw(error)
-							}
-							else {
-								console.log(`>> User ${newUser._id} migrated`)
-							}
-						})
-					}
-				})
+				await utils.updateModel(User, userObj, newUser, 'User')
 			})
 		}
 		else {
@@ -94,10 +67,10 @@ const removeResetPasswordFields = async () => {
 	console.log('> removeResetPasswordFields')
 	await User.find({ resetPasswordToken: { $exists: true }, resetPasswordExpires: { $exists: true } }, (error, user) => {
 		if (error) {
-			throw(error)
+			throw error
 		}
 		else {
-			user.forEach(userObj => {
+			user.forEach(async userObj => {
 				const newUser = new User({ 
 					name: userObj.name || null,
 					email: userObj.email || null ,
@@ -110,21 +83,7 @@ const removeResetPasswordFields = async () => {
 					_id: userObj._id
 				})
 
-				User.remove({ _id: userObj._id }, (error) => {
-					if (error) {
-						throw(error)
-					  }  
-					  else {
-						newUser.save(error => {
-							if (error) {
-								throw(error)
-							}
-							else {
-								console.log(`>> User ${newUser._id} migrated`)
-							}
-						})
-					}
-				})
+				await utils.updateModel(User, userObj, newUser, 'User')
 			})
 		}
 	})

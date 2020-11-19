@@ -4,16 +4,20 @@ const UserMigrations = require('./userMigrations')
 
 try {
     mongoose.connect(conStr, {
-        useNewUrlParser: true,
-        useCreateIndex: true,
-        useFindAndModify: false,
-        useUnifiedTopology: true,
+        useNewUrlParser: true
     })
     .then(async (con) => {
         console.log('User migrations')
-        await UserMigrations.addProfilePictureField()
-        await UserMigrations.addNicknameField()
-        await UserMigrations.removeResetPasswordFields()
+        try {
+            await UserMigrations.addProfilePictureField()
+            await UserMigrations.addNicknameField()
+            await UserMigrations.removeResetPasswordFields()
+            
+            return process.exit(0)
+        }
+        catch (e) {
+            console.log(e)
+        }
         console.log('\n')
     })
 } catch (e) {
