@@ -40,17 +40,21 @@ describe('ProfileEdit components tests', () => {
         cy.get('[data-test-id="height"]').type('170').should('have.value', '170')
         cy.get('[data-test-id="weight"]').type('75.0').should('have.value', '75.0')
         cy.get('[data-test-id="preferredFoot"]').select('Esquerdo').should('have.value', 'Esquerdo')
-        cy.fixture('test.jpg', 'base64')
+        attachProfilePictureAux()
+        cy.wait(1000)
+        cy.get('[data-test-id="profilePicture"]').should('include.value', 'https://firebasestorage.googleapis.com/v0/b/footapp-frontend.appspot.com/o/images')
+    }
+
+    const attachProfilePictureAux = (imgFormat) => {
+        cy.fixture('test.' + (imgFormat ? imgFormat : 'jpg'), 'base64')
             .then(Cypress.Blob.base64StringToBlob)
             .then(fileContent => {
                 cy.get('[data-test-id="profilePictureAux"]').attachFile({
                     fileContent: fileContent,
-                    fileName: 'test.jpg',
-                    mimeType: 'image/jpg'
+                    fileName: imgFormat ? 'test.' + imgFormat : 'test.jpg',
+                    mimeType: imgFormat ? 'image/' + imgFormat : 'image/jpg'
                 })
             })
-        cy.wait(1000)
-        cy.get('[data-test-id="profilePicture"]').should('include.value', 'https://firebasestorage.googleapis.com/v0/b/footapp-frontend.appspot.com/o/images')
     }
 
     it ('renders successfully - profileEdit', () => {
@@ -128,30 +132,14 @@ describe('ProfileEdit components tests', () => {
     })
 
     it ('wrong image format - profilePicture', () => {
-        cy.fixture('test.pdf', 'base64')
-            .then(Cypress.Blob.base64StringToBlob)
-            .then(fileContent => {
-                cy.get('[data-test-id="profilePictureAux"]').attachFile({
-                    fileContent: fileContent,
-                    fileName: 'test.pdf',
-                    mimeType: 'image/pdf'
-                })
-            })
+        attachProfilePictureAux('pdf')
         cy.wait(1000)
         cy.get('[data-test-id="profilePicture"]').should('have.value', '')
     })
 
     it ('remove image inserted - profilePicture', () => {
         fillProfileUpdateFormCorrectly()
-        cy.fixture('test.jpg', 'base64')
-            .then(Cypress.Blob.base64StringToBlob)
-            .then(fileContent => {
-                cy.get('[data-test-id="profilePictureAux"]').attachFile({
-                    fileContent: fileContent,
-                    fileName: 'test.jpg',
-                    mimeType: 'image/jpg'
-                })
-            })
+        attachProfilePictureAux()
         cy.wait(1000)
         cy.get('[data-test-id="profilePicture"]').should('include.value', 'https://firebasestorage.googleapis.com/v0/b/footapp-frontend.appspot.com/o/images')
         cy.get('[data-test-id="profilePictureAux_delete"]').click()

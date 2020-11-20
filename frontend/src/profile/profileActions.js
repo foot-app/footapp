@@ -15,9 +15,7 @@ export const update = (values, nickname) => {
         if (validateUpdateData(values)) {
             axios.put(`${consts.API_URL}/user/${nickname}`, values)
                 .then(response => {
-                    if (response.data.message) {
-                        toastr.success('', response.data.message)     
-                    }
+                    toastr.success('', response.data.message)     
                     changeAuthNickname(values.nickname)
                     window.location = '#/profile'
                 })
@@ -28,19 +26,21 @@ export const update = (values, nickname) => {
     }
 }
 
+const treatCallbackAndUserInfo = (callback, setUserInfo, response, dispatch) => {
+    if (callback) {
+        callback(response.data.userData)
+    }
+
+    if (setUserInfo) {
+        dispatch({ type: 'SET_USER_INFO', payload: response.data.userData})
+    }
+}
+
 export const getUserByNickname = (nickname, callback, setUserInfo) => {
     return dispatch => {
         axios.get(`${consts.API_URL}/user/${nickname}`)
             .then(response => {
-                if (response && response.data) {
-                    if (callback) {
-                        callback(response.data.userData)
-                    }
-
-                    if (setUserInfo) {
-                        dispatch({ type: 'SET_USER_INFO', payload: response.data.userData})
-                    }
-                }
+                treatCallbackAndUserInfo(callback, setUserInfo, response, dispatch)
             })
             .catch(e => {
                 e.response.data.errors.forEach(error => toastr.error('Erro', error))

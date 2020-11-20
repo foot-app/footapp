@@ -9,6 +9,7 @@ import normalizeWeight from '../common/form/masks/normalizeWeight'
 import normalizeHeight from '../common/form/masks/normalizeHeight'
 import { toastr } from 'react-redux-toastr'
 import { uploadImageToFirebase, deleteImageFromFirebase } from '../firebase/firebaseTasks'
+import InputDefault from '../common/form/inputDefault'
 
 class ProfileEditForm extends Component {
     constructor(props) {
@@ -72,20 +73,8 @@ class ProfileEditForm extends Component {
                     <legend>Cadastro</legend>
                     <div className='form-group'>
                         <Row>
-                            <Grid cols='12 4'>
-                                <label htmlFor='name'>Nome completo</label>
-                                <Field name='name' component='input'
-                                    className='form-control'
-                                    type='text'
-                                    data-test-id='name' />
-                            </Grid>
-                            <Grid cols='12 4'>
-                                <label htmlFor='nickname'>Nome de usuário</label>
-                                <Field name='nickname' component='input'
-                                    className='form-control'
-                                    type='text'
-                                    data-test-id='nickname' />
-                            </Grid>
+                            <InputDefault cols='12 4' name='name' labelText='Nome completo' component='input' className='form-control' type='text' dataTestId='name' />
+                            <InputDefault cols='12 4' name='nickname' labelText='Nome de usuário' component='input' className='form-control' type='text' dataTestId='nickname' />
                             <Grid cols='12 4'>
                                 <label htmlFor='profilePictureAux'>Foto de perfil</label>
                                 <div className='input-group'>
@@ -112,22 +101,8 @@ class ProfileEditForm extends Component {
                     <legend>Físico</legend>
                     <div className='form-group'>
                         <Row>
-                            <Grid cols='12 4'>
-                                <label htmlFor='height'>Altura (cm)</label>
-                                <Field name='height' component='input'
-                                    className='form-control'
-                                    type='text'
-                                    normalize={normalizeHeight}
-                                    data-test-id='height' />
-                            </Grid>
-                            <Grid cols='12 4'>
-                                <label htmlFor='weight'>Peso (kg)</label>
-                                <Field name='weight' component='input'
-                                    className='form-control'
-                                    type='text'
-                                    normalize={normalizeWeight}
-                                    data-test-id='weight' />
-                            </Grid>
+                            <InputDefault cols='12 4' name='height' labelText='Altura (cm)' component='input' className='form-control' type='text' normalize={normalizeHeight} dataTestId='height' />
+                            <InputDefault cols='12 4' name='weight' labelText='Peso (kg)' component='input' className='form-control' type='text' normalize={normalizeWeight} dataTestId='weight' />
                             <Grid cols='12 4'>
                                 <label htmlFor='preferredFoot'>Pé preferido</label>
                                 <Field name='preferredFoot' component='select'

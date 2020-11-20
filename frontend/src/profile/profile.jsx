@@ -18,19 +18,23 @@ class Profile extends Component {
             window.location = '/#/auth'
         }
         else {
-            let userNickname = authUser.nickname
-
-            const userKey = '_footapp'
-            const userInfoLocalStorage = JSON.parse(localStorage.getItem(userKey))
-            const userStateNickname = userInfoLocalStorage.nickname
-
-            if (userStateNickname && userNickname != userStateNickname) {
-                userNickname = userStateNickname
-                this.props.changeLoggedUserInfo(userInfoLocalStorage)
-            }
-
-            this.props.getUserByNickname(userNickname, false, true)
+            this.loadLoggedUserInfo(authUser)
         }
+    }
+
+    loadLoggedUserInfo(authUser) {
+        let userNickname = authUser.nickname
+
+        const userKey = '_footapp'
+        const userInfoLocalStorage = JSON.parse(localStorage.getItem(userKey))
+        const userStateNickname = userInfoLocalStorage.nickname
+
+        if (userStateNickname && userNickname != userStateNickname) {
+            userNickname = userStateNickname
+            this.props.changeLoggedUserInfo(userInfoLocalStorage)
+        }
+
+        this.props.getUserByNickname(userNickname, false, true)
     }
 
     render() {

@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const User = require('./user')
 const env = process.env.AUTH_SECRET ? null : require('../../.env')
-const { sendErrorsFromDB } = require('../common/sendErrorsFromDb')
+const dbErrors = require('../common/sendErrorsFromDb')
 const user = require('./user')
 
 const emailRegex = /\S+@\S+\.\S+/
@@ -13,7 +13,7 @@ const login = (req, res, next) => {
     const password = req.body.password || ''
     User.findOne({ email }, (err, user) => {
         if (err) {
-            return sendErrorsFromDB(res, err)
+            return dbErrors.sendErrorsFromDB(res, err)
         } else if (user && bcrypt.compareSync(password, user.password)) {
             const token = jwt.sign(user, process.env.AUTH_SECRET ? process.env.AUTH_SECRET : env.authSecret, {
                 expiresIn: "1 day"
@@ -60,7 +60,7 @@ const signup = async (req, res, next) => {
 
     User.findOne({ nickname }, (err, user) => {
         if (err) {
-            return sendErrorsFromDB(res, err)
+            return dbErrors.sendErrorsFromDB(res, err)
         }
         else if (user) {
             return res.status(400).send({ errors: ['Usuário já cadastrado.'] })
@@ -68,20 +68,20 @@ const signup = async (req, res, next) => {
         else {
             User.findOne({ email }, (err, user) => {
                 if (err) {
-                    return sendErrorsFromDB(res, err)
+                    return dbErrors.sendErrorsFromDB(res, err)
                 } else if (user) {
                     return res.status(400).send({ errors: ['Usuário já cadastrado.'] })
                 } else {
                     User.findOne({ nickname }, (err, user) => {
                         if (err) {
-                            return sendErrorsFromDB(res, err)
+                            return dbErrors.sendErrorsFromDB(res, err)
                         } else if (user) {
                             return res.status(400).send({ errors: ['Usuário já cadastrado.'] })
                         } else {
                             const newUser = new User({ name, email, nickname, password: passwordHash })
                             newUser.save(err => {
                                 if (err) {
-                                    return sendErrorsFromDB(res, err)
+                                    return dbErrors.sendErrorsFromDB(res, err)
                                 } else {
                                     login(req, res, next)
                                 }

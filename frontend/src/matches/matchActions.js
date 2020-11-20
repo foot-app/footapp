@@ -47,53 +47,30 @@ const createDataObject = (values) => {
 
 const validadeData = (values) => {
     const arrErrors = []
+    const mapFieldsError = { name: 'nome', street: 'rua', number: 'número', neighborhood: 'bairro', city: 'cidade', state: 'estado', date: 'data', schedule: 'horário' }
 
-    if (!values.name) {
-        arrErrors.push('Campo nome é de preenchimento obrigatório')
-    }
+    Object.keys(mapFieldsError).forEach(field => {
+        if (!values[field])
+            arrErrors.push(`O campo ${mapFieldsError[field]} é de preenchimento obrigatório`)
+        else {
+            if (field == 'date') {
+                const day = values.date.slice(0, 2);
+                const month = values.date.slice(3, 5);
+                const year = values.date.slice(6, 10);
+                if (!moment(`${day} ${month} ${year}`, 'DD MM YYYY').isValid()) {
+                    arrErrors.push('Data inválida');
+                } 
+            }
+            else if (field == 'schedule') {
+                const hour = values.schedule.slice(0, 2);
+                const minute = values.schedule.slice(3, 5);
 
-    if (!values.street) {
-        arrErrors.push('Campo rua é de preenchimento obrigatório')
-    }
-
-    if (!values.number) {
-        arrErrors.push('Campo número é de preenchimento obrigatório')
-    }
-
-    if (!values.neighborhood) {
-        arrErrors.push('Campo bairro é de preenchimento obrigatório')
-    }
-
-    if (!values.city) {
-        arrErrors.push('Campo cidade é de preenchimento obrigatório')
-    }
-    
-    if (!values.state) {
-        arrErrors.push('Campo estado é de preenchimento obrigatório')
-    }
-
-    if (!values.date) {
-        arrErrors.push('Campo data é de preenchimento obrigatório')
-    }
-    else {
-        const day = values.date.slice(0, 2);
-        const month = values.date.slice(3, 5);
-        const year = values.date.slice(6, 10);
-        if(!moment(`${day} ${month} ${year}`, 'DD MM YYYY').isValid()) {
-            arrErrors.push('Data inválida');
+                if(hour > 23 || minute > 59) {
+                    arrErrors.push('Horário inválido');
+                }
+            }
         }
-    }
-    if (!values.schedule) {
-        arrErrors.push('Campo horário é de preenchimento obrigatório')
-    }
-    else {
-        const hour = values.schedule.slice(0, 2);
-        const minute = values.schedule.slice(3, 5);
-
-        if(hour > 23 || minute > 59) {
-            arrErrors.push('Horário inválido');
-        }
-    }
+    })
 
     arrErrors.forEach(error => {
         toastr.error('', error)

@@ -1,3 +1,15 @@
+const buildDate = (valueOnlyNumbers, day, month, year) => {
+    let buildedDate = ""
+
+    if (valueOnlyNumbers.length < 2) buildedDate = `${day}`;
+    else if (valueOnlyNumbers.length == 2) buildedDate = `${day}/`;
+    else if (valueOnlyNumbers.length < 4) buildedDate = `${day}/${month}`;
+    else if (valueOnlyNumbers.length == 4) buildedDate = `${day}/${month}/`;
+    else if (valueOnlyNumbers.length > 4) buildedDate = `${day}/${month}/${year}`;
+
+    return buildedDate
+}
+
 const normalizeDate = (value, prevValue) => {
     if (!value) return value;
   
@@ -10,11 +22,7 @@ const normalizeDate = (value, prevValue) => {
     const month = valueOnlyNumbers.slice(2, 4);
     const year = valueOnlyNumbers.slice(4, 8);
   
-    if (valueOnlyNumbers.length < 2) return `${day}`;
-    if (valueOnlyNumbers.length == 2) return `${day}/`;
-    if (valueOnlyNumbers.length < 4) return `${day}/${month}`;
-    if (valueOnlyNumbers.length == 4) return `${day}/${month}/`;
-    if (valueOnlyNumbers.length > 4) return `${day}/${month}/${year}`;
+    return buildDate(valueOnlyNumbers, day, month, year)
   }
 
   export default normalizeDate
