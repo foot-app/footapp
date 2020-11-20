@@ -45,6 +45,8 @@
       "<rootDir>/node_modules",
       "<rootDir>/src"
     ],
-    "modulePathIgnorePatterns": ["utils"]
+    "modulePathIgnorePatterns": [
+      "utils"
+    ]
   }
 }
