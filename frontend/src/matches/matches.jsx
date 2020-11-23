@@ -14,19 +14,34 @@ class Matches extends Component {
 
     componentWillMount() {
         this.props.loadMyMatches()
-        console.log(this.props.match.myMatches)
     }
 
     renderMatchesTable() {
         return this.props.match.myMatches.map((match, index) => {
             const { name, matchType} = match
+            const date = this.formatDate(match.date)
             return (
                 <tr key={index} data-test-id={`table_item_${index}`}>
                     <td>{name}</td>
                     <td>{matchType}</td>
+                    <td>{date}</td>
                 </tr>
             )
         })
+    }
+
+    formatDate(stringDate) {
+        const date = new Date(stringDate)
+        let month = String(date.getMonth() + 1);
+        let day = String(date.getDate());
+        const year = String(date.getFullYear());
+        const hour = String(date.getHours());
+        const minutes = String(date.getMinutes());
+
+        if (month.length < 2) month = '0' + month;
+        if (day.length < 2) day = '0' + day;
+
+        return `${day}/${month}/${year} - ${hour}:${minutes}`;
     }
 
     renderTableHeader() {
@@ -34,6 +49,7 @@ class Matches extends Component {
             <tr>
                 <th>NOME</th>
                 <th>TIPO</th>
+                <th>DATA E HORÁRIO</th>
             </tr>
         )
     }
