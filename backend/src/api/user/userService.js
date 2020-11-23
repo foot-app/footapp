@@ -1,27 +1,13 @@
-const _ = require('lodash')
 const User = require('./user')
-
-const sendErrorsFromDB = (res, dbErrors) => {
-    const errors = []
-
-    if (dbErrors.err > 1) {
-        _.forIn(dbErrors.err, error => errors.push(error.message))
-    }
-    else {
-        errors.push(dbErrors.message)
-    }
-    
-    return res.status(400).json({
-        errors
-    })
-}
+const dbErrors = require('../common/sendErrorsFromDb')
+const changesObjUtils = require('../common/populateChangesObj')
 
 const getUserByNickname = (req, res, next) => {
     const nickname = req.params.nickname
 
     User.findOne({ nickname }, (error, user) => {
         if (error) {
-            return sendErrorsFromDB(res, error)
+            return dbErrors.sendErrorsFromDB(res, error)
         }
         else if (!user) {
             return res.status(400).json({ errors: ['Usuário não encontrado'] })
@@ -46,16 +32,12 @@ const updateUser = async (req, res, next) => {
     const changesObj = {}
     const propertiesName = Object.getOwnPropertyNames(req.body)
 
-    propertiesName.forEach(propertieName => {
-        if (propertieName != 'password_confirmation') {
-            changesObj[propertieName] = req.body[propertieName]
-        }
-    })
+    await changesObjUtils.populateChangesObj(propertiesName, changesObj, ['password_confirmation'], req)
 
     if (changesObj.nickname != nickname) {
         await User.findOne({ nickname: changesObj.nickname }, (error, user) => {
             if (error) {
-                return sendErrorsFromDB(res, error)
+                return dbErrors.sendErrorsFromDB(res, error)
             }
             else if (user) {
                 return res.status(400).json({ errors: ['Nome de usuário já cadastrado'] })
@@ -63,7 +45,7 @@ const updateUser = async (req, res, next) => {
             else {
                 User.findOne({ nickname }, (error, user) => {
                     if (error) {
-                        return sendErrorsFromDB(res, error)
+                        return dbErrors.sendErrorsFromDB(res, error)
                     }
                     else if (!user) {
                         return res.status(400).json({ errors: ['Usuário não encontrado'] })
@@ -71,7 +53,7 @@ const updateUser = async (req, res, next) => {
                     else {
                         User.findOneAndUpdate({ nickname }, changesObj, (error, user) => {
                             if (error) {
-                                return sendErrorsFromDB(res, error)
+                                return dbErrors.sendErrorsFromDB(res, error)
                             }
                             else {
                                 return res.status(200).json({ message: 'Informações alteradas com sucesso', data: user })
@@ -85,7 +67,7 @@ const updateUser = async (req, res, next) => {
     else {
         User.findOne({ nickname }, (error, user) => {
             if (error) {
-                return sendErrorsFromDB(res, error)
+                return dbErrors.sendErrorsFromDB(res, error)
             }
             else if (!user) {
                 return res.status(400).json({ errors: ['Usuário não encontrado'] })
@@ -93,7 +75,7 @@ const updateUser = async (req, res, next) => {
             else {
                 User.findOneAndUpdate({ nickname }, changesObj, (error, user) => {
                     if (error) {
-                        return sendErrorsFromDB(res, error)
+                        return dbErrors.sendErrorsFromDB(res, error)
                     }
                     else {
                         return res.status(200).json({ message: 'Informações alteradas com sucesso', data: user })

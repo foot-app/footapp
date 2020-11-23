@@ -1,25 +1,57 @@
-const mongoose = require('mongoose')
+const utils = require('../utils')
 const request = require('supertest')
 const User = require('../../api/user/user')
-const { MongoMemoryServer } = require('mongodb-memory-server');
-const server = require('../../loader');
+const server = require('../../loader')
 let app
-var mongoServer
+
+const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' }
+const fakeUserSignup = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' }
+
+const login = async (email, password, statusCode) => {
+    await request(server).post('/oapi/user/login')
+        .send({ email: email, password: password })
+        .expect(statusCode)
+}
+
+const multipleSignup = async (arrayUsers, arrayStatusCode) => {
+    let statusCodeIndex = 0
+    await arrayUsers.forEach(async user => {
+        await utils.signUp(arrayStatusCode[statusCodeIndex], user)
+        statusCodeIndex++
+    })
+}
+
+const registerUserAlreadyRegistered = async (fakeUser, attributeToChangeKey, attributeToChangeValue) => {
+    const copyFakeUserSignup = Object.assign({}, fakeUser)
+    copyFakeUserSignup[attributeToChangeKey] = attributeToChangeValue
+    await multipleSignup([fakeUser, copyFakeUserSignup], [200, 400])
+}
+
+const cantGetUserByAttribute = async (fakeUser, statusCode, searchKey) => {
+    const response = await autoSignupAndLogin(fakeUser)
+    await request(server).get(`/api/user/${searchKey}`)
+        .set('authorization', response.body.token)
+        .expect(statusCode)
+}
+
+const autoSignupAndLogin = async (fakeUser) => {
+    await utils.signUp(200, fakeUser)
+    return await request(server).post('/oapi/user/login')
+        .send({ email: fakeUser.email, password: fakeUser.password })
+        .expect(200)
+}
+
+const signupWithInvalidData = async (statusCode, attributeToChangeKey, attributeToChangeValue) => {
+    const copyFakeUserSignup = Object.assign({}, fakeUserSignup)
+    await utils.signUp(statusCode, copyFakeUserSignup, attributeToChangeKey, attributeToChangeValue)
+}
 
 beforeAll(async () => {
-    mongoServer = new MongoMemoryServer();
-    const URI = await mongoServer.getUri();
-
-    mongoose.connect(URI, {
-        useNewUrlParser: true,
-        useCreateIndex: true,
-        useUnifiedTopology: true,
-    })
+    await utils.connectMongoInMemory()
 })
 
 afterAll(async done => {
-    mongoose.disconnect(done);
-    await mongoServer.stop();
+    await utils.disconnectMongoose(done)
 })
 
 describe('user model test', () => {
@@ -37,49 +69,31 @@ describe('user model test', () => {
 
     describe('get user', () => {
         it('gets a user', async () => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
-            await user.save()
-
-            const foundUser = await User.findOne({ email: 'foo@foo.com'})
-            const expected = 'foo'
-            const actual = foundUser.name
-            expect(actual).toEqual(expected)
+            await utils.getModel(User, fakeUser, 'email', 'foo@foo.com', 'name', 'foo')
         })
     })
 
     describe('save user', () => {
         it('saves a user', async () => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
-            const savedUser = await user.save()
-            const expected = 'foo'
-            const actual = savedUser.name
-            expect(actual).toEqual(expected)
+            await utils.saveModel(User, fakeUser, 'name', 'foo')
         })
     })
 
     describe('update user', () => {
         it('updates a user', async () => {
-            const user = new User({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
-            await user.save()
-
-            user.name = 'bar'
-            const updatedUser = await user.save()
-
-            const expected = 'bar'
-            const actual = updatedUser.name
-            expect(actual).toEqual(expected)
+            await utils.updateModel(User, fakeUser, 'name', 'bar')
         })
     })
 })
 
 describe('user routes tests', () => {
     beforeAll(async () => {
-        app = await server.listen(3001)
-        await User.deleteMany({})
+        await utils.startServer()
+        await utils.resetDB([User])
     })
 
     afterAll(async done => {
-        app.close(done)
+        await utils.closeServer(done)
     })
 
     afterEach(async () => {
@@ -88,110 +102,64 @@ describe('user routes tests', () => {
 
     describe('user login tests', () => {
         it ('can login', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123!' })
-                .expect(200)
+            await utils.signUp(200, fakeUserSignup)
+            await login('foo@foo.com', 'Foo@123!', 200)
         })
 
         it ('can\'t login - user not registered', async () => {
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123!' })
-                .expect(400)
+            await login('foo@foo.com', 'Foo@123!', 400)
         })
 
         it ('can\'t login - wrong password', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123' })
-                .expect(400)
+            await utils.signUp(200, fakeUserSignup)
+            await login('foo@foo.com', 'Foo@123', 400)
         })
 
         it ('can\'t login - wrong email', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.co', password: 'Foo@123!' })
-                .expect(400)
+            await utils.signUp(200, fakeUserSignup)
+            await login('foo@foo.co', 'Foo@123!', 400)
         })
 
         it ('can\'t login - wrong email and password', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.co', password: 'Foo@123' })
-                .expect(400)
+            await utils.signUp(200, fakeUserSignup)
+            await login('foo@foo.co', 'Foo@123', 400)
         })
     })
 
     describe('user signup tests', () => {
         it ('can signup', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
+            await utils.signUp(200, fakeUserSignup)
         })
 
         it ('can\'t signup - user already registered - email', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo1234', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(400)
+            registerUserAlreadyRegistered(fakeUserSignup, 'nickname', 'foo1234')
         })
 
         it ('can\'t signup - user already registered - nickname', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo123@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(400)
+            registerUserAlreadyRegistered(fakeUserSignup, 'email', 'foo123@foo.com')
         })
 
         it ('can\'t signup - invalid email', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foofoo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(400)
+            await signupWithInvalidData(400, 'email', 'foofoo.com')
         })
 
         it ('can\'t signup - invalid password', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'foo', confirm_password: 'Foo@123!' })
-                .expect(400)
+            await signupWithInvalidData(400, 'password', 'foo')
         })
 
         it ('can\'t signup - passwords fields don\'t match', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123' })
-                .expect(400)
+            await signupWithInvalidData(400, 'confirm_password', 'Foo@123')
         })
 
         it ('can\'t signup - no nickname', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: '', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(400)
+            await signupWithInvalidData(400, 'nickname', '')
         })
     })
 
     describe('user validateToken tests', () => {
         it ('can validate', async () => {
-            let token
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123!' })
-                .expect(200)
-                .then(response => {
-                    token = response.body.token
-                })
+            const response = await autoSignupAndLogin(fakeUserSignup)
+            const token = response.body.token
             await request(server).post('/oapi/user/validateToken')
                 .send({ token: token })
                 .expect(200)
@@ -206,16 +174,8 @@ describe('user routes tests', () => {
 
     describe('user getUserByNickname tests', () => {
         it ('can getUserByNickname', async () => {
-            let token
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123!' })
-                .expect(200)
-                .then(response => {
-                    token = response.body.token
-                })
+            const response = await autoSignupAndLogin(fakeUserSignup)
+            const token = response.body.token
             await request(server).get('/api/user/foo123')
                 .set('authorization', token)
                 .expect(200)
@@ -225,70 +185,33 @@ describe('user routes tests', () => {
         })
 
         it ('can\'t getUserByNickname - no nickname', async () => {
-            let token
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123!' })
-                .expect(200)
-                .then(response => {
-                    token = response.body.token
-                })
-            await request(server).get('/api/user/')
-                .set('authorization', token)
-                .expect(404)
+            await cantGetUserByAttribute(fakeUserSignup, 404, '')
         })
 
         it ('can\'t getUserByNickname - no authentication', async () => {
-            let token
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123!' })
-                .expect(200)
-                .then(response => {
-                    token = response.body.token
-                })
+            const response = await autoSignupAndLogin(fakeUserSignup)
             await request(server).get('/api/user/foo123')
                 .expect(403)
         })
 
         it ('can\'t getUserByNickname - user not found', async () => {
-            let token
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123!' })
-                .expect(200)
-                .then(response => {
-                    token = response.body.token
-                })
-            await request(server).get('/api/user/foo1234')
-                .set('authorization', token)
-                .expect(400)
+            await cantGetUserByAttribute(fakeUserSignup, 400, 'foo1234')
         })
     })
 
     describe('user updateUser tests', () => {
-        it ('can updateUser', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123!' })
-                .expect(200)
-                .then(response => {
-                    token = response.body.token
-                })
-            await request(server).put('/api/user/foo123')
+        const updateUser = async (token, nickname, statusCode) => {
+            await request(server).put(`/api/user/${nickname}`)
                 .set('authorization', token)
                 .send({ height: 170, weight: 70, preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
-                .expect(200)
+                .expect(statusCode)
+        }
+
+        it ('can updateUser', async () => {
+            const response = await autoSignupAndLogin(fakeUserSignup)
+            await updateUser(response.body.token, 'foo123', 200)
             await request(server).get('/api/user/foo123')
-                .set('authorization', token)
+                .set('authorization', response.body.token)
                 .expect(200)
                 .then(response => {
                     expect(response.body.userData.height).toEqual(170)
@@ -299,28 +222,18 @@ describe('user routes tests', () => {
         })
 
         it ('can\'t updateUser - user not found', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/login')
-                .send({ email: 'foo@foo.com', password: 'Foo@123!' })
-                .expect(200)
-                .then(response => {
-                    token = response.body.token
-                })
-            await request(server).put('/api/user/foo1234')
-                .set('authorization', token)
-                .send({ height: 170, weight: 70, preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
-                .expect(400)
+            const response = await autoSignupAndLogin(fakeUserSignup)
+            await updateUser(response.body.token, 'foo1234', 400)
         })
 
         it ('can\'t updateUser - nickname already in use', async () => {
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
-            await request(server).post('/oapi/user/signup')
-                .send({ name: 'foo', email: 'foo1234@foo.com', nickname: 'foo1234', password: 'Foo@123!', confirm_password: 'Foo@123!' })
-                .expect(200)
+            await utils.signUp(200, fakeUserSignup)
+
+            const secondUser = Object.assign({}, fakeUserSignup)
+            secondUser.email = 'foo1234@foo.com'
+            secondUser.nickname = 'foo1234'
+
+            await utils.signUp(200, secondUser)
             await request(server).post('/oapi/user/login')
                 .send({ email: 'foo@foo.com', password: 'Foo@123!', profilePicture: 'https://foo.com.br/image.png' })
                 .expect(200)

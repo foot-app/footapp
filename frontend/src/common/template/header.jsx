@@ -3,13 +3,13 @@ import { Link } from 'react-router'
 
 class Header extends Component {
     toggleSidebar() {
-        if (document.getElementById("menu-sidebar").getAttribute('data-state') == 'opened') {
-            document.getElementById("menu-sidebar").style.width = "0";
-            document.getElementById("menu-sidebar").setAttribute('data-state', 'closed')
+        if ($("#menu-sidebar").attr('data-state') == 'opened') {
+            $("#menu-sidebar").css("width", 0)
+            $("#menu-sidebar").attr("data-state", "closed")
         }
         else {
-            document.getElementById("menu-sidebar").style.width = "250px";
-            document.getElementById("menu-sidebar").setAttribute('data-state', 'opened')
+            $("#menu-sidebar").css("width", 250)
+            $("#menu-sidebar").attr("data-state", "opened")
         }
     }
     

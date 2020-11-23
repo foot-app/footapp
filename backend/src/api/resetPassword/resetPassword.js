@@ -6,6 +6,7 @@ const moment = require('moment')
 
 const User = require('../user/user');
 const ResetPasswordRequisition = require('./resetPasswordRequisition');
+const dbErrors = require('../common/sendErrorsFromDb')
 
 const emailRegex = /\S+@\S+\.\S+/
 const passwordRegex = /((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!]).{6,20})/
@@ -26,7 +27,7 @@ const sendResetPasswordEmail = (req, res, next) => {
 
     User.findOne({ email }, (err, user) => {
         if (err) {
-            return sendErrorsFromDB(res, err);
+            return dbErrors.sendErrorsFromDB(res, err);
         } else if (user) {
             const token = crypto.randomBytes(20).toString('hex');
             const newResetPasswordRequisition = new ResetPasswordRequisition({
@@ -38,7 +39,7 @@ const sendResetPasswordEmail = (req, res, next) => {
 
             newResetPasswordRequisition.save(err => {
                 if(err) {
-                    return sendErrorsFromDB(res, err);
+                    return dbErrors.sendErrorsFromDB(res, err);
                 }
                 else {
                     const transporter = nodemailer.createTransport({
@@ -92,7 +93,7 @@ const changePassword = (req, res, next) => {
 
     ResetPasswordRequisition.findOne({ token }, (err, resetPasswordRequisition) => {
         if( err ) {
-            return sendErrorsFromDB(res, err);
+            return dbErrors.sendErrorsFromDB(res, err);
         } 
         else if (resetPasswordRequisition) {
             const startDateTs = resetPasswordRequisition.startDateTs
@@ -103,7 +104,7 @@ const changePassword = (req, res, next) => {
             if(todayTs >= startDateTs && todayTs <= endDateTs) {
                 User.findOneAndUpdate({ email }, { password: passwordHash }, (err, user) => {
                     if (err) {
-                        return sendErrorsFromDB(res, err)
+                        return dbErrors.sendErrorsFromDB(res, err)
                     }
                     else if (user) {
                         ResetPasswordRequisition.deleteOne({ _id: id }, (err, resetPasswordRequisitionDeleted) => {
@@ -120,15 +121,6 @@ const changePassword = (req, res, next) => {
             return res.status(400).send({errors: ['Token inválido!']})
         }
     });
-}
-
-const sendErrorsFromDB = (res, dbErrors) => {
-    const errors = []
-
-    _.forIn(dbErrors.errors, error => errors.push(error.message))
-    return res.status(400).json({
-        errors
-    })
 }
 
 module.exports = { sendResetPasswordEmail, changePassword };

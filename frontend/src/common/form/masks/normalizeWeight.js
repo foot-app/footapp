@@ -1,3 +1,11 @@
+const sliceAndReplaceOnlyNums = (onlyNums) => {
+    if (onlyNums[0] == '0' && onlyNums.length > 2) {
+        onlyNums = onlyNums.replace('0', '')
+    }
+
+    return onlyNums.slice(0, onlyNums.length - 1) + '.' + onlyNums.slice(onlyNums.length - 1, onlyNums.length)
+}
+
 const normalizeWeight = (value) => {
     if (!value) {
         return value
@@ -9,11 +17,7 @@ const normalizeWeight = (value) => {
         return '0.' + onlyNums
     }
     else {
-        if (onlyNums[0] == '0' && onlyNums.length > 2) {
-            onlyNums = onlyNums.replace('0', '')
-        }
-
-        return onlyNums.slice(0, onlyNums.length - 1) + '.' + onlyNums.slice(onlyNums.length - 1, onlyNums.length)
+        return sliceAndReplaceOnlyNums(onlyNums)    
     }
 }
 

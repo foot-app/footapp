@@ -2,26 +2,14 @@ import React, { Component } from 'react'
 
 export default class Grid extends Component {
 
-    toCssClasses(numbers) {
-        const cols = numbers ? numbers.split(' ') : []
+    toCssClasses(numbers, attribute) {
+        const values = numbers ? numbers.split(' ') : []
         let classes = ''
 
-        if (cols[0]) classes += `col-${cols[0]}`
-        if (cols[1]) classes += ` col-sm-${cols[1]}`
-        if (cols[2]) classes += ` col-md-${cols[2]}`
-        if (cols[3]) classes += ` col-lg-${cols[3]}`
-
-        return classes
-    }
-
-    generateOffset(numbers) {
-        const cols = numbers ? numbers.split(' ') : []
-        let classes = ''
-
-        if (cols[0]) classes += ` offset-${cols[0]}`
-        if (cols[1]) classes += ` offset-sm-${cols[1]}`
-        if (cols[2]) classes += ` offset-md-${cols[2]}`
-        if (cols[3]) classes += ` offset-lg-${cols[3]}`
+        if (values[0]) classes += ` ${attribute}-${values[0]}`
+        if (values[1]) classes += ` ${attribute}-sm-${values[1]}`
+        if (values[2]) classes += ` ${attribute}-md-${values[2]}`
+        if (values[3]) classes += ` ${attribute}-lg-${values[3]}`
 
         return classes
     }
@@ -37,8 +25,8 @@ export default class Grid extends Component {
     }
 
     render() {
-        const gridClasses = this.toCssClasses(this.props.cols || '12')
-        const gridOffset = this.generateOffset(this.props.offset || '')
+        const gridClasses = this.toCssClasses(this.props.cols || '12', 'col')
+        const gridOffset = this.toCssClasses(this.props.offset || '', 'offset')
         const textCenter = this.generateTextCenter(this.props.textCenter)
         const className = this.generateClassName(this.props.className)
         return (
