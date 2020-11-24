@@ -9,6 +9,7 @@ import Grid from '../common/layout/grid'
 import Row from '../common/layout/row'
 import If from '../common/operator/if'
 import { Link } from 'react-router'
+import ProfileRecordDataSection from './profileRecordDataSection'
 
 class Profile extends Component {
     componentWillMount() {
@@ -40,28 +41,7 @@ class Profile extends Component {
     render() {
         return (
             <div id='profile-content' className='container'>
-                <section className='record-data-section'>
-                    <If test={this.props.profile.userInfo.profilePicture}>
-                        <Row id='profilePicture-row'>
-                            <Grid cols='12' className='text-center'>
-                                <p>
-                                    <img src={this.props.profile.userInfo.profilePicture || ''} alt={this.props.profile.userInfo.name || ''}
-                                    data-test-id='profilePicture' />
-                                </p>
-                            </Grid>
-                        </Row>
-                    </If>
-                    <Row id='name-row'>
-                        <Grid cols='12' className='text-center'>
-                            <p data-test-id='name'>{this.props.profile.userInfo.name || ''}</p>
-                        </Grid>
-                    </Row>
-                    <Row id='nickname-row'>
-                        <Grid cols='12' className='text-center'>
-                            <p data-test-id='nickname'><span id='best-know-as-span'>Mais conhecido(a) como </span>{this.props.profile.userInfo.nickname || ''}</p>
-                        </Grid>
-                    </Row>
-                </section>
+                <ProfileRecordDataSection profilePicture={this.props.profile.userInfo.profilePicture} name={this.props.profile.userInfo.name || ''} nickname={this.props.profile.userInfo.nickname || ''} height={this.props.profile.userInfo.height} weight={this.props.profile.userInfo.weight} preferredFoot={this.props.profile.userInfo.preferredFoot} />
                 <section className='physical-characteristics-section'>
                     <Row id='physical-row'>
                         <Grid cols='12' className='text-center'>
