@@ -86,7 +86,44 @@ const sendResetPasswordEmail = async (req, res, next) => {
     return await findUser(email, res, startDateTs, endDateTs)
 }
 
-const changePassword = (req, res, next) => {
+const findUserAndUpdate = async (res, resetPasswordRequisition, todayTs, passwordHash) => {
+    const startDateTs = resetPasswordRequisition.startDateTs
+    const endDateTs = resetPasswordRequisition.endDateTs
+    const email = resetPasswordRequisition.email;
+    const id = resetPasswordRequisition._id;
+
+    if (todayTs >= startDateTs && todayTs <= endDateTs) {
+        await User.findOneAndUpdate({ email }, { password: passwordHash }, async (err, user) => {
+            if (err) {
+                return dbErrors.sendErrorsFromDB(res, err)
+            }
+            else if (user) {
+                await ResetPasswordRequisition.deleteOne({ _id: id }, () => {
+                    return res.status(200).send({response: 'Senha alterada com sucesso!'})
+                })
+            }
+        })
+    }
+    else {
+        return res.status(400).send({ errors: ['Solicitação expirada.'] })
+    }
+}
+
+const findResetPasswordRequisition = async (res, token, passwordHash, todayTs) => {
+    await ResetPasswordRequisition.findOne({ token }, async (err, resetPasswordRequisition) => {
+        if( err ) {
+            return dbErrors.sendErrorsFromDB(res, err);
+        } 
+        else if (resetPasswordRequisition) {
+            return await findUserAndUpdate(res, resetPasswordRequisition, todayTs, passwordHash)
+        } 
+        else {
+            return res.status(400).send({errors: ['Token inválido!']})
+        }
+    });
+}
+
+const changePassword = async (req, res, next) => {
     const token = req.body.token || '';
     const password = req.body.password || '';
     const confirmationPassword = req.body.confirmationPassword || '';
@@ -103,36 +140,7 @@ const changePassword = (req, res, next) => {
         return res.status(400).send({ errors: ['Senhas não conferem.'] })
     }
 
-    ResetPasswordRequisition.findOne({ token }, (err, resetPasswordRequisition) => {
-        if( err ) {
-            return dbErrors.sendErrorsFromDB(res, err);
-        } 
-        else if (resetPasswordRequisition) {
-            const startDateTs = resetPasswordRequisition.startDateTs
-            const endDateTs = resetPasswordRequisition.endDateTs
-            const email = resetPasswordRequisition.email;
-            const id = resetPasswordRequisition._id;
-
-            if(todayTs >= startDateTs && todayTs <= endDateTs) {
-                User.findOneAndUpdate({ email }, { password: passwordHash }, (err, user) => {
-                    if (err) {
-                        return dbErrors.sendErrorsFromDB(res, err)
-                    }
-                    else if (user) {
-                        ResetPasswordRequisition.deleteOne({ _id: id }, (err, resetPasswordRequisitionDeleted) => {
-                            return res.status(200).send({response: 'Senha alterada com sucesso!'})
-                        })
-                    }
-                })
-            }
-            else {
-                return res.status(400).send({ errors: ['Solicitação expirada.'] })
-            }
-        } 
-        else {
-            return res.status(400).send({errors: ['Token inválido!']})
-        }
-    });
+    return await findResetPasswordRequisition(res, token, passwordHash, todayTs)
 }
 
 module.exports = { sendResetPasswordEmail, changePassword };
