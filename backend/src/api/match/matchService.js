@@ -29,4 +29,28 @@ const createMatch = async (req, res, next) => {
     })
 }
 
-module.exports = { createMatch }
+const listMyMatches = async (req, res, next) => {
+    await Match.find({ownerNickname: req.params.nickname}, (err, matches) => {
+        if(err) {
+            return sendErrorsFromDB(res, err)
+        } 
+        else if(matches) {
+            return res.status(200).json(matches)
+        }
+        else {
+            return res.status(200).json([])
+        }
+    })
+}
+
+
+const sendErrorsFromDB = (res, dbErrors) => {
+    const errors = []
+
+    _.forIn(dbErrors.errors, error => errors.push(error.message))
+    return res.status(400).json({
+        errors
+    })
+}
+
+module.exports = { createMatch, listMyMatches }
