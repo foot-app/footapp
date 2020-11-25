@@ -53,7 +53,7 @@ describe('MatchDelete components test', () => {
     it('can delete match', () => {
         createMatch()
         cy.get('[data-test-id="table_item"]').should('exist')
-        cy.get('[data-test-id="delete-match-button"]').click({ multiple: true })
+        cy.get('[data-test-id="delete-match-button"]').click()
         cy.wait(500)
         cy.url().should('eq', 'http://localhost:8081/#/matches')
         cy.get('[data-test-id="table_item"]').should('not.exist')
