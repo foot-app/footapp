@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import { toastr } from 'react-redux-toastr'
 
 import Grid from '../common/layout/grid'
 import Row from '../common/layout/row'
 import { Link } from 'react-router'
-import { loadMyMatches } from './matchActions'
+import { loadMyMatches, deleteMatch } from './matchActions'
 
 class Matches extends Component {
     constructor(props) {
@@ -16,15 +17,28 @@ class Matches extends Component {
         this.props.loadMyMatches()
     }
 
+    onClickEventDeleteMatch(event) {
+        let promise = this.props.deleteMatch(event.target.id);
+            promise.then(() => {
+                this.props.loadMyMatches();
+            })
+            promise.catch(e => {
+                e.response.data.errors.forEach(error => toastr.error('Erro', error))
+            })
+    }
+
     renderMatchesTable() {
         return this.props.match.myMatches.map((match, index) => {
-            const { name, matchType} = match
+            const { _id, name, matchType} = match
             const date = this.formatDate(match.date)
             return (
-                <tr key={index} data-test-id={`table_item_${index}`}>
+                <tr key={_id} data-test-id={`table_item`}>
                     <td>{name}</td>
                     <td>{matchType}</td>
                     <td>{date}</td>
+                    <td>
+                        <i data-test-id='delete-match-button' id={_id} onClick={ event => this.onClickEventDeleteMatch(event)} className="fa fa-trash trash-icon"></i>
+                    </td>
                 </tr>
             )
         })
@@ -50,6 +64,7 @@ class Matches extends Component {
                 <th>NOME</th>
                 <th>TIPO</th>
                 <th>DATA E HORÁRIO</th>
+                <th></th>
             </tr>
         )
     }
@@ -77,8 +92,8 @@ class Matches extends Component {
 }
 
 const mapStateToProps = state => ({ 
-    match: state.match 
+    match: state.match,
 })
-const mapDispatchToProps = dispatch => bindActionCreators({ loadMyMatches } , dispatch)
+const mapDispatchToProps = dispatch => bindActionCreators({ loadMyMatches, deleteMatch } , dispatch)
 
 export default connect(mapStateToProps, mapDispatchToProps)(Matches)

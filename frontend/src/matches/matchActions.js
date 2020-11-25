@@ -46,6 +46,23 @@ export const loadMyMatches = () => {
     }
 }
 
+
+export const deleteMatch = (matchId) => {
+    return dispatch => {
+        return new Promise(resolve => {
+            axios.put(`${consts.API_URL}/match/delete`, {matchId})
+            .then(response => {
+                toastr.success('Sucesso', 'A partida foi deletada com sucesso!')
+                resolve()
+            })
+            .catch(e => {
+                e.response.data.errors.forEach(error => toastr.error('Erro', error))
+                resolve()
+            })
+        })
+    }
+}
+
 export const resetForm = (formValues) => {
     return dispatch => {
         dispatch(reset('createMatchForm'))
