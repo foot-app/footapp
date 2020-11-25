@@ -61,26 +61,33 @@ const createDataObject = (values) => {
     return new Date(year, month, day, hour, minute, 0, 0);
 }
 
+const setInvalidDate = (values, arrErrors) => {
+    const day = values.date.slice(0, 2);
+    const month = values.date.slice(3, 5);
+    const year = values.date.slice(6, 10);
+    
+    if (!moment(`${day} ${month} ${year}`, 'DD MM YYYY').isValid()) {
+        arrErrors.push('Data inválida');
+    } 
+}
+
+const setInvalidSchedule = (values, arrErrors) => {
+    const hour = values.schedule.slice(0, 2);
+    const minute = values.schedule.slice(3, 5);
+
+    if (hour > 23 || minute > 59) {
+        arrErrors.push('Horário inválido');
+    }
+}
+
 const evaluateField = (values, field, mapFieldsError, arrErrors) => {
     if (!values[field])
         arrErrors.push(`O campo ${mapFieldsError[field]} é de preenchimento obrigatório`)
-    else {
-        if (field == 'date') {
-            const day = values.date.slice(0, 2);
-            const month = values.date.slice(3, 5);
-            const year = values.date.slice(6, 10);
-            if (!moment(`${day} ${month} ${year}`, 'DD MM YYYY').isValid()) {
-                arrErrors.push('Data inválida');
-            } 
-        }
-        else if (field == 'schedule') {
-            const hour = values.schedule.slice(0, 2);
-            const minute = values.schedule.slice(3, 5);
-
-            if(hour > 23 || minute > 59) {
-                arrErrors.push('Horário inválido');
-            }
-        }
+    else if (field == 'date') {
+        setInvalidDate(values, arrErrors)
+    }
+    else if (field == 'schedule') {
+        setInvalidSchedule(values, arrErrors)
     }
 }
 
