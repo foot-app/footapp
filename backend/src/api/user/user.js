@@ -9,7 +9,9 @@ const userSchema = new mongoose.Schema({
     height: { type: Number, min: 1 },
     weight: { type: Number, min: 1 },
     preferredFoot: { type: String, enum: ['Direito', 'Esquerdo', 'Ambos'] },
-    profilePicture: { type: String }
+    profilePicture: { type: String },
+    fut7Positions: [String],
+    futsalPositions: [String]
 })
 
 module.exports = restful.model('User', userSchema)

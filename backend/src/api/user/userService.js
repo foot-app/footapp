@@ -20,7 +20,9 @@ const getUserByNickname = (req, res, next) => {
                 height: user.height,
                 weight: user.weight,
                 preferredFoot: user.preferredFoot,
-                profilePicture: user.profilePicture
+                profilePicture: user.profilePicture,
+                fut7Positions: user.fut7Positions,
+                futsalPositions: user.futsalPositions
             }
             return res.status(200).json({ userData })
         }
