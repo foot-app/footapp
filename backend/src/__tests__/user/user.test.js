@@ -4,7 +4,7 @@ const User = require('../../api/user/user')
 const server = require('../../loader')
 let app
 
-const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' }
+const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png', fut7Positions: ['gk', 'zc'], futsalPositions: ['gk'] }
 const fakeUserSignup = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' }
 
 const login = async (email, password, statusCode) => {
@@ -203,7 +203,7 @@ describe('user routes tests', () => {
         const updateUser = async (token, nickname, statusCode) => {
             await request(server).put(`/api/user/${nickname}`)
                 .set('authorization', token)
-                .send({ height: 170, weight: 70, preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png' })
+                .send({ height: 170, weight: 70, preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png', fut7Positions: ['gk', 'zc'], futsalPositions: ['gk'] })
                 .expect(statusCode)
         }
 
