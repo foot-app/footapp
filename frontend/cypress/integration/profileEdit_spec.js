@@ -124,6 +124,7 @@ describe('ProfileEdit components tests', () => {
         cy.get('input[name="futsal-positions-gk"]').uncheck()
         cy.get('input[name="futsal-positions-fx"]').uncheck()
         cy.get('[data-test-id="submit-button"]').click()
+        cy.wait(1000)
         cy.get('[data-test-id="name"]').contains('Foo Foolish Foo')
         cy.get('[data-test-id="nickname"]').contains('foo1234')
         cy.get('[data-test-id="physical-data"]').contains('170')
