@@ -5,6 +5,7 @@ const User = require('../../api/user/user')
 const server = require('../../loader')
 var mongoose = require('mongoose');
 const { iteratee } = require('lodash')
+const match = require('../../api/match/match')
 let app
 
 const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' }
@@ -25,9 +26,8 @@ const createUserAndLogin = () => {
 const sendDeleteMatchRequisition = (token, matchId) => {
     return new Promise(async resolve => {
         const res = await request(server)
-            .put('/api/match/delete')
+            .delete(`/api/match/delete/${matchId}`)
             .set('authorization', token)
-            .send({matchId})
         resolve(res)
     })
 }

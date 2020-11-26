@@ -44,8 +44,7 @@ const listMyMatches = async (req, res, next) => {
 }
 
 const deleteMatch = async (req, res, next) => {
-
-    const matchId = req.body.matchId;
+    const matchId = req.params.id;
     Match.deleteOne({ _id: matchId}, (err, result) => {
         if(err) {
             return sendErrorsFromDB(res, err)

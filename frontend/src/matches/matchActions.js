@@ -50,7 +50,7 @@ export const loadMyMatches = () => {
 export const deleteMatch = (matchId) => {
     return dispatch => {
         return new Promise(resolve => {
-            axios.put(`${consts.API_URL}/match/delete`, {matchId})
+            axios.delete(`${consts.API_URL}/match/delete/${matchId}`)
             .then(response => {
                 toastr.success('Sucesso', 'A partida foi deletada com sucesso!')
                 resolve()

@@ -50,13 +50,23 @@ describe('MatchDelete components test', () => {
         cy.get('[data-test-id="createMatchButton"]').should('exist')
     }
 
-    it('can delete match', () => {
+    it ('can delete match', () => {
         createMatch()
         cy.get('[data-test-id="table_item"]').should('exist')
-        cy.get('[data-test-id="delete-match-button"]').click()
+        cy.get('[data-test-id="delete-match-button-0"]').click()
         cy.wait(500)
         cy.url().should('eq', 'http://localhost:8081/#/matches')
         cy.get('[data-test-id="table_item"]').should('not.exist')
+    })
+
+    it ('delete the correct match', () => {
+        createMatch()
+        createMatch()
+        cy.get('[data-test-id="table_item"]').should('exist')
+        cy.get('[data-test-id="delete-match-button-0"]').click()
+        cy.wait(500)
+        cy.url().should('eq', 'http://localhost:8081/#/matches')
+        cy.get('[data-test-id="delete-match-button-0"]').should('exist')
     })
     
 })

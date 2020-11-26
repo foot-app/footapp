@@ -37,7 +37,7 @@ class Matches extends Component {
                     <td>{matchType}</td>
                     <td>{date}</td>
                     <td>
-                        <i data-test-id='delete-match-button' id={_id} onClick={ event => this.onClickEventDeleteMatch(event)} className="fa fa-trash trash-icon"></i>
+                        <i data-test-id={`delete-match-button-${index}`} id={_id} onClick={ event => this.onClickEventDeleteMatch(event)} className="fa fa-trash trash-icon"></i>
                     </td>
                 </tr>
             )
