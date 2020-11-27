@@ -77,6 +77,7 @@ describe('ProfileEdit components tests', () => {
         fillProfileUpdateFormCorrectly()
         cy.get('[data-test-id="name"]').clear()
         cy.get('[data-test-id="submit-button"]').click()
+        cy.wait(1000)
         cy.url().should('eq', 'http://localhost:8081/#/profile/edit')
     })
 
@@ -84,6 +85,7 @@ describe('ProfileEdit components tests', () => {
         fillProfileUpdateFormCorrectly()
         cy.get('[data-test-id="nickname"]').clear()
         cy.get('[data-test-id="submit-button"]').click()
+        cy.wait(1000)
         cy.url().should('eq', 'http://localhost:8081/#/profile/edit')
     })
 
