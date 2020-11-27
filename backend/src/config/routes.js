@@ -19,6 +19,8 @@ module.exports = function (server) {
 	const Match = require('../api/match/matchService');
 	protectedApi.put('/match/create', Match.createMatch)
 	protectedApi.get('/matches/:nickname', Match.listMyMatches)
+	protectedApi.delete('/match/delete/:id', Match.deleteMatch)
+
 	
 	/*
 	* Rotas abertas
