@@ -13,8 +13,8 @@
 |:----------:|:-------------:|:------:|
 | Frontend | Production | https://frontend-zff7duw2vq-uc.a.run.app |
 | Backend | Production | https://backend-zff7duw2vq-uc.a.run.app |
-| Frontend | Pre Production | https://frontend-release-candidate-zff7duw2vq-uc.a.run.app |
-| Backend | Pre Production | https://backend-release-candidate-zff7duw2vq-uc.a.run.app |
+| Frontend | Pre Production | https://frontend-pre-production-zff7duw2vq-rj.a.run.app |
+| Backend | Pre Production | https://backend-pre-production-zff7duw2vq-rj.a.run.app |
 
 ## Backlog
 
