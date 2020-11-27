@@ -12,7 +12,7 @@ import ProfileEditForm from './profileEditForm'
 class ProfileEdit extends Component {
     constructor(props) {
         super(props)
-        this.getNicknameAndUpdate = this.getNicknameAndUpdate.bind(this)
+        this.prepareFormDataAndUpdate = this.prepareFormDataAndUpdate.bind(this)
     }
 
     componentWillMount() {
@@ -27,8 +27,23 @@ class ProfileEdit extends Component {
         }
     }
 
-    getNicknameAndUpdate(values) {
+    getValuesFromCheckbox(selector, array) {
+        $.each($(selector), (index, element) => {
+            array.push($(element).val())
+        })
+    }
+
+    prepareFormDataAndUpdate(values) {
         const userNickname = this.props.auth.user.nickname
+        const fut7Positions = []
+        const futsalPositions = []
+
+        this.getValuesFromCheckbox("[name^='fut7-positions']:checked", fut7Positions)
+        this.getValuesFromCheckbox("[name^='futsal-positions']:checked", futsalPositions)
+
+        values.fut7Positions = fut7Positions
+        values.futsalPositions = futsalPositions
+
         this.props.update(values, userNickname)
     }
 
@@ -42,7 +57,7 @@ class ProfileEdit extends Component {
                 </Row>
                 <Row>
                     <Grid cols='12' className='text-center'>
-                        <ProfileEditForm onSubmit={this.getNicknameAndUpdate}/>
+                        <ProfileEditForm onSubmit={this.prepareFormDataAndUpdate}/>
                     </Grid>
                 </Row>
             </div>

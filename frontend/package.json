@@ -7,6 +7,7 @@
     "dev": "webpack-dev-server --progress --colors --inline --hot --host 0.0.0.0",
     "unit-test": "jest",
     "end-to-end-test": "npx cypress run",
+    "pre-production": "NODE_ENV=pre_production webpack --progress -p",
     "production": "NODE_ENV=production webpack --progress -p",
     "start": "http-server -p 8081"
   },

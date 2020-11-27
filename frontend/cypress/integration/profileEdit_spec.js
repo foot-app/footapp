@@ -40,6 +40,10 @@ describe('ProfileEdit components tests', () => {
         cy.get('[data-test-id="height"]').type('170').should('have.value', '170')
         cy.get('[data-test-id="weight"]').type('75.0').should('have.value', '75.0')
         cy.get('[data-test-id="preferredFoot"]').select('Esquerdo').should('have.value', 'Esquerdo')
+        cy.get('input[name="fut7-positions-gk"]').check()
+        cy.get('[data-test-id="matchType"]').select('futsal')
+        cy.get('input[name="futsal-positions-gk"]').check()
+        cy.get('input[name="futsal-positions-fx"]').check()
         attachProfilePictureAux()
         cy.wait(1000)
         cy.get('[data-test-id="profilePicture"]').should('include.value', 'https://firebasestorage.googleapis.com/v0/b/footapp-frontend.appspot.com/o/images')
@@ -71,12 +75,17 @@ describe('ProfileEdit components tests', () => {
         cy.get('[data-test-id="physical-data"]').contains('75')
         cy.get('[data-test-id="physical-data"]').contains('Esquerdo')
         cy.get('[data-test-id="profilePicture"]').should('have.attr', 'src').should('include', 'https://firebasestorage.googleapis.com/v0/b/footapp-frontend.appspot.com/o/images')
+        cy.get('[data-test-id="edit-button"]').click()
+        cy.wait(1000)
+        cy.get('input[name="futsal-positions-gk"]').should('be.checked')
+        cy.get('input[name="futsal-positions-fx"]').should('be.checked')
     })
 
     it ('update fail - no name', () => {
         fillProfileUpdateFormCorrectly()
         cy.get('[data-test-id="name"]').clear()
         cy.get('[data-test-id="submit-button"]').click()
+        cy.wait(1000)
         cy.url().should('eq', 'http://localhost:8081/#/profile/edit')
     })
 
@@ -84,6 +93,7 @@ describe('ProfileEdit components tests', () => {
         fillProfileUpdateFormCorrectly()
         cy.get('[data-test-id="nickname"]').clear()
         cy.get('[data-test-id="submit-button"]').click()
+        cy.wait(1000)
         cy.url().should('eq', 'http://localhost:8081/#/profile/edit')
     })
 
@@ -109,6 +119,23 @@ describe('ProfileEdit components tests', () => {
         cy.get('[data-test-id="physical-data"]').contains('170')
         cy.get('[data-test-id="physical-data"]').contains('-')
         cy.get('[data-test-id="physical-data"]').contains('Esquerdo')
+    })
+
+    it ('update successfully - no position', () => {
+        fillProfileUpdateFormCorrectly()
+        cy.get('input[name="futsal-positions-gk"]').uncheck()
+        cy.get('input[name="futsal-positions-fx"]').uncheck()
+        cy.get('[data-test-id="submit-button"]').click()
+        cy.wait(1000)
+        cy.get('[data-test-id="name"]').contains('Foo Foolish Foo')
+        cy.get('[data-test-id="nickname"]').contains('foo1234')
+        cy.get('[data-test-id="physical-data"]').contains('170')
+        cy.get('[data-test-id="physical-data"]').contains('75')
+        cy.get('[data-test-id="physical-data"]').contains('Esquerdo')
+        cy.get('[data-test-id="edit-button"]').click()
+        cy.wait(1000)
+        cy.get('input[name="futsal-positions-gk"]').should('not.be.checked')
+        cy.get('input[name="futsal-positions-fx"]').should('not.be.checked')
     })
 
     it ('cancel update', () => {

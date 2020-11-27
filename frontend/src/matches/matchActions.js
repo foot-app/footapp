@@ -13,7 +13,7 @@ export const create = (values) => {
     values.ownerNickname = userInfoLocalStorage.nickname
 
     return dispatch => {
-        if(validadeData(values)) {
+        if(validateData(values)) {
             values.date = createDataObject(values);
             axios.put(`${consts.API_URL}/match/create`, values)
             .then(response => {
@@ -27,6 +27,39 @@ export const create = (values) => {
                 e.response.data.errors.forEach(error => toastr.error('Erro', error))
             })
         } 
+    }
+}
+
+export const loadMyMatches = () => {
+    const userKey = '_footapp'
+    const userInfoLocalStorage = JSON.parse(localStorage.getItem(userKey));
+    const ownerNickname = userInfoLocalStorage.nickname;
+
+    return dispatch => {
+        axios.get(`${consts.API_URL}/matches/${ownerNickname}`)
+            .then(response => {
+                dispatch({ type: 'SET_MY_MATCHES', payload: [...response.data]})
+            })
+            .catch(e => {
+                e.response.data.errors.forEach(error => toastr.error('Erro', error))
+            })
+    }
+}
+
+
+export const deleteMatch = (matchId) => {
+    return dispatch => {
+        return new Promise(resolve => {
+            axios.delete(`${consts.API_URL}/match/delete/${matchId}`)
+            .then(response => {
+                toastr.success('Sucesso', 'A partida foi deletada com sucesso!')
+                resolve()
+            })
+            .catch(e => {
+                e.response.data.errors.forEach(error => toastr.error('Erro', error))
+                resolve()
+            })
+        })
     }
 }
 
@@ -45,31 +78,42 @@ const createDataObject = (values) => {
     return new Date(year, month, day, hour, minute, 0, 0);
 }
 
-const validadeData = (values) => {
+const setInvalidDate = (values, arrErrors) => {
+    const day = values.date.slice(0, 2);
+    const month = values.date.slice(3, 5);
+    const year = values.date.slice(6, 10);
+    
+    if (!moment(`${day} ${month} ${year}`, 'DD MM YYYY').isValid()) {
+        arrErrors.push('Data inválida');
+    } 
+}
+
+const setInvalidSchedule = (values, arrErrors) => {
+    const hour = values.schedule.slice(0, 2);
+    const minute = values.schedule.slice(3, 5);
+
+    if (hour > 23 || minute > 59) {
+        arrErrors.push('Horário inválido');
+    }
+}
+
+const evaluateField = (values, field, mapFieldsError, arrErrors) => {
+    if (!values[field])
+        arrErrors.push(`O campo ${mapFieldsError[field]} é de preenchimento obrigatório`)
+    else if (field == 'date') {
+        setInvalidDate(values, arrErrors)
+    }
+    else if (field == 'schedule') {
+        setInvalidSchedule(values, arrErrors)
+    }
+}
+
+const validateData = (values) => {
     const arrErrors = []
     const mapFieldsError = { name: 'nome', street: 'rua', number: 'número', neighborhood: 'bairro', city: 'cidade', state: 'estado', date: 'data', schedule: 'horário' }
 
     Object.keys(mapFieldsError).forEach(field => {
-        if (!values[field])
-            arrErrors.push(`O campo ${mapFieldsError[field]} é de preenchimento obrigatório`)
-        else {
-            if (field == 'date') {
-                const day = values.date.slice(0, 2);
-                const month = values.date.slice(3, 5);
-                const year = values.date.slice(6, 10);
-                if (!moment(`${day} ${month} ${year}`, 'DD MM YYYY').isValid()) {
-                    arrErrors.push('Data inválida');
-                } 
-            }
-            else if (field == 'schedule') {
-                const hour = values.schedule.slice(0, 2);
-                const minute = values.schedule.slice(3, 5);
-
-                if(hour > 23 || minute > 59) {
-                    arrErrors.push('Horário inválido');
-                }
-            }
-        }
+        evaluateField(values, field, mapFieldsError, arrErrors)
     })
 
     arrErrors.forEach(error => {

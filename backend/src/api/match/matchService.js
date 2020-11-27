@@ -29,4 +29,44 @@ const createMatch = async (req, res, next) => {
     })
 }
 
-module.exports = { createMatch }
+const listMyMatches = async (req, res, next) => {
+    await Match.find({ownerNickname: req.params.nickname}, (err, matches) => {
+        if(err) {
+            return sendErrorsFromDB(res, err)
+        } 
+        else if(matches) {
+            return res.status(200).json(matches)
+        }
+        else {
+            return res.status(200).json([])
+        }
+    })
+}
+
+const deleteMatch = async (req, res, next) => {
+    const matchId = req.params.id;
+    Match.deleteOne({ _id: matchId}, (err, result) => {
+        if(err) {
+            return sendErrorsFromDB(res, err)
+        }
+        else if(result.n === 1 && result.ok === 1) {
+            return res.status(200).json({ message: 'Partida excluída com sucesso!'})
+        }
+        else if(result.n === 0) {
+            return res.status(400).json({erros: ['Partida não encontrada!']})
+        }
+    })
+ 
+}
+
+
+const sendErrorsFromDB = (res, dbErrors) => {
+    const errors = []
+
+    _.forIn(dbErrors.errors, error => errors.push(error.message))
+    return res.status(400).json({
+        errors
+    })
+}
+
+module.exports = { createMatch, listMyMatches, deleteMatch }

@@ -53,6 +53,7 @@ const saveModel = async (Model, fakeObj, saveExpectedAttribute, saveExpectedValu
     const expected = saveExpectedValue
     const actual = savedModel[saveExpectedAttribute]
     expect(actual).toEqual(expected)
+    return savedModel;
 }
 
 const updateModel = async (Model, fakeObj, updateAttribute, updateAttributeNewValue) => {
