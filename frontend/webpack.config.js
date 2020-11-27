@@ -27,8 +27,7 @@ module.exports = {
         }),
         new ExtractTextPlugin('app.css'),
         new webpack.DefinePlugin({
-            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV),
-            'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL)
+            'process.env.NODE_ENV': JSON.stringify(process.env.NODE_ENV)
         })
     ],
     module: {
