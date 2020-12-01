@@ -2,8 +2,26 @@ import React, { Component } from 'react'
 import { Link } from 'react-router'
 
 class Header extends Component {
-    toggleSidebar() {
-        if ($("#menu-sidebar").attr('data-state') == 'opened') {
+    constructor(props) {
+        super(props) 
+        this.componentDidMount = this.componentDidMount.bind(this)
+    }
+
+    componentDidMount() {
+        const _this = this
+        $(window).scroll(function() {
+            if ($(this).scrollTop() < 45) {
+                $("#header").fadeIn(200)
+            } 
+            else {
+                $("#header").fadeOut(200)
+                _this.toggleSidebar('close')
+            }
+        })
+    }
+
+    toggleSidebar(force) {
+        if ($("#menu-sidebar").attr('data-state') == 'opened' || force == 'close') {
             $("#menu-sidebar").css("width", 0)
             $("#menu-sidebar").attr("data-state", "closed")
         }
