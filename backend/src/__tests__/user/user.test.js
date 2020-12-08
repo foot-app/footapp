@@ -6,6 +6,8 @@ let app
 
 const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png', fut7Positions: ['gk', 'zc'], futsalPositions: ['gk'] }
 const fakeUserSignup = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' }
+const fakeBarUser = { name: 'bar', email: 'bar@bar.com', nickname: 'bar123', password: 'Bar@123!', confirm_password: 'Bar@123!' }
+const fakePopUser = { name: 'pop', email: 'pop@pop.com', nickname: 'pop123', password: 'Pop@123!', confirm_password: 'Pop@123!' }
 
 const login = async (email, password, statusCode) => {
     await request(server).post('/oapi/user/login')
@@ -244,6 +246,32 @@ describe('user routes tests', () => {
                 .set('authorization', token)
                 .send({ height: 170, weight: 70, preferredFoot: 'Direito', nickname: 'foo1234' })
                 .expect(400)
+        })
+    })
+
+    describe('user getUsersByQuery tests', () => {
+        it ('can getUsersByQuery', async () => {
+            await multipleSignup([fakeBarUser, fakePopUser], [200, 200])
+            const response = await autoSignupAndLogin(fakeUserSignup)
+            const token = response.body.token
+            await request(server).get('/api/user/search/foo')
+                .set('authorization', token)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.users.length).toEqual(1)
+                })
+        })
+
+        it ('can\'t getUsersByQuery - user not found', async () => {
+            await multipleSignup([fakeBarUser, fakePopUser], [200, 200])
+            const response = await autoSignupAndLogin(fakeUserSignup)
+            const token = response.body.token
+            await request(server).get('/api/user/search/pele')
+                .set('authorization', token)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.errors.length).toEqual(1)
+                })
         })
     })
 })

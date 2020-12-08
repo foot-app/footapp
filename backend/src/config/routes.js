@@ -14,13 +14,13 @@ module.exports = function (server) {
 
 	const User = require('../api/user/userService')
 	protectedApi.get('/user/:nickname', User.getUserByNickname)
+	protectedApi.get('/user/search/:value', User.getUsersByQuery)
 	protectedApi.put('/user/:nickname', User.updateUser)
 
 	const Match = require('../api/match/matchService');
 	protectedApi.put('/match/create', Match.createMatch)
 	protectedApi.get('/matches/:nickname', Match.listMyMatches)
 	protectedApi.delete('/match/delete/:id', Match.deleteMatch)
-
 	
 	/*
 	* Rotas abertas

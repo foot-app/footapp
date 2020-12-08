@@ -1,0 +1,13 @@
+#social-content { margin-top: 90px; }
+#social-content input, #social-content select { background-color: #15202b !important ; border-top: 0; border-right: 0; border-left: 0; color: #ccc; }
+#social-content label { color: white; }
+#social-content .input-group-text { color: #b1f900; border-top: 0; border-left: 0; border-right: 0; border-radius: 0 4px; }
+#social-content #userSearch-list { background-color: #b1f900; }
+#social-content #searchedUser-info-row img { width: 100%; border-radius: 50%; }
+#social-content #searchedUser-info-row p { font-size: 18px; color: white; }
+#social-content #searchedUser-info-row #searchedUser-info-nickname { color: #b1f900; }
+#social-content #searchedUser-info-row div { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+
+@media (max-width: 576px) {
+    #social-content #searchedUser-info-row img { width: 50%; }
+}

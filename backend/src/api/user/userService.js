@@ -93,4 +93,18 @@ const updateUser = async (req, res, next) => {
     }
 }
 
-module.exports = { getUserByNickname, updateUser }
+const getUsersByQuery = async (req, res, next) => {
+    const value = req.params.value || ''
+    const valueExp = new RegExp(value, 'i')
+    const query = { $or: [{ name: valueExp }, { email: valueExp }, { nickname: valueExp }]}
+    User.find(query, (error, users) => {
+        if (!users || users.length <= 0) {
+            return res.status(200).json({ errors: ['Nenhum usuário não encontrado'] })
+        }
+        else {
+            return res.status(200).json({ users })
+        }
+    })
+}
+
+module.exports = { getUserByNickname, updateUser, getUsersByQuery }
