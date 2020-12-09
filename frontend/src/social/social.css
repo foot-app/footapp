@@ -6,7 +6,9 @@
 #social-content #searchedUser-info-row img { width: 100%; border-radius: 50%; }
 #social-content #searchedUser-info-row p { font-size: 18px; color: white; }
 #social-content #searchedUser-info-row #searchedUser-info-nickname { color: #b1f900; }
-#social-content #searchedUser-info-row div { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+#social-content #searchedUser-info-row .searchedUser-info-div { display: flex; flex-direction: column; justify-content: center; align-items: center; }
+#social-content #searchedUser-info-row .searchedUser-button-div { display: flex; flex-direction: row; justify-content: center; align-items: center; }
+#social-content #searchedUser-info-row .searchedUser-button-div button { margin: 5px; }
 
 @media (max-width: 576px) {
     #social-content #searchedUser-info-row img { width: 50%; }

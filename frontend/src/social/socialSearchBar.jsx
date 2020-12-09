@@ -7,6 +7,7 @@ import Row from '../common/layout/row'
 import If from '../common/operator/if'
 import { searchUsers } from './socialActions'
 import consts from '../consts'
+import { clearUserInfo } from './socialUtils'
 
 class SocialSearchBar extends Component {
     constructor(props) {
@@ -26,14 +27,6 @@ class SocialSearchBar extends Component {
         this.props.searchUsers(searchValue)
     }
 
-    cleanUserInfo() {
-        $('#searchedUser-info-name').text('')
-        $('#searchedUser-info-nickname').text('')
-        $('#fut7-positions').text('')
-        $('#futsal-positions').text('')
-        $('#searchedUser-img').attr('src', '').attr('alt', '')
-    }
-
     showPositions(positionsArray, selector) {
         positionsArray.forEach((position, index) => {
             $(selector).append(position.toUpperCase() + (index < positionsArray.length - 1 ? '-' : ''))
@@ -41,8 +34,10 @@ class SocialSearchBar extends Component {
     }
 
     loadUserInfo(user) {
-        this.cleanUserInfo()
+        clearUserInfo()
         $('#searchedUser-info-row').show()
+        $('#userSearch-list').hide()
+        $('#userSearch').val('')
         
         const userFut7Positions = user.fut7Positions || []
         const userFutsalPositions = user.futsalPositions || []
@@ -57,6 +52,7 @@ class SocialSearchBar extends Component {
     }
 
     renderSearchResultList(searchUserList) {
+        $('#userSearch-list').show()
         const userList = searchUserList || []
         const userKey = '_footapp'
         const currentUserInfoLocalStorage = JSON.parse(localStorage.getItem(userKey));

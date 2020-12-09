@@ -92,4 +92,19 @@ describe('ProfileEdit components tests', () => {
             cy.get('[data-test-id=info-positions]').should('have.text', 'Fut7: GK-ZC | Futsal: FX-PV')
         })
     })
+
+    describe('searched user info tests', () => {
+        it ('search for user and close search', () => {
+            createBarUser()
+            cy.get('[data-test-id=userSearch]').type('Bar Bearer')
+            cy.get('[data-test-id=userSearch-list]').find('li').click()
+            cy.wait(500)
+            cy.get('[data-test-id=clean-button]').click()
+            cy.get('[data-test-id=info-img]').should('have.attr', 'src').should('equal', '')
+            cy.get('[data-test-id=info-name]').should('have.text', '')
+            cy.get('[data-test-id=info-nickname]').should('have.text', '')
+            cy.get('[data-test-id=info-positions]').should('have.text', 'Fut7:  | Futsal: ')
+            cy.get('[data-test-id=userSearch]').should('have.value', '')
+        })
+    })
 })
