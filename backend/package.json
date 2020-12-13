@@ -46,7 +46,8 @@
       "<rootDir>/src"
     ],
     "modulePathIgnorePatterns": [
-      "utils"
+      "utils",
+      "(.*)Utils"
     ]
   }
 }

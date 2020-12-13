@@ -78,6 +78,12 @@ const signUp = async (statusCode, userObj, attributeToChangeKey, attributeToChan
         .expect(statusCode)
 }
 
+const login = async (email, password) => {
+    return await request(server).post('/oapi/user/login')
+        .send({ email: email, password: password })
+        .expect(200)
+}
+
 module.exports = {
     connectMongoInMemory,
     disconnectMongoose,
@@ -87,5 +93,6 @@ module.exports = {
     getModel,
     saveModel,
     updateModel,
-    signUp
+    signUp,
+    login
 }

@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt')
 const User = require('./user')
 const env = process.env.AUTH_SECRET ? null : require('../../.env')
 const dbErrors = require('../common/sendErrorsFromDb')
-const user = require('./user')
 
 const emailRegex = /\S+@\S+\.\S+/
 const passwordRegex = /((?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%!]).{6,20})/

@@ -21,6 +21,13 @@ module.exports = function (server) {
 	protectedApi.put('/match/create', Match.createMatch)
 	protectedApi.get('/matches/:nickname', Match.listMyMatches)
 	protectedApi.delete('/match/delete/:id', Match.deleteMatch)
+
+	const FriendshipRequest = require('../api/friendshipRequest/friendshipRequestService')
+	protectedApi.get('/friendshipRequest/nickname/:nickname', FriendshipRequest.getFriendshipRequests)
+	protectedApi.get('/friendshipRequest/:id', FriendshipRequest.getFriendshipRequestById)
+	protectedApi.post('/friendshipRequest', FriendshipRequest.sendFriendshipRequest)
+	protectedApi.delete('/friendshipRequest/:id', FriendshipRequest.cancelFriendshipRequest)
+	protectedApi.put('/friendshipRequest/:id', FriendshipRequest.acceptFriendshipRequest)
 	
 	/*
 	* Rotas abertas

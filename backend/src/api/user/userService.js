@@ -1,6 +1,7 @@
 const User = require('./user')
 const dbErrors = require('../common/sendErrorsFromDb')
 const changesObjUtils = require('../common/populateChangesObj')
+const mongooseFunctions = require('../common/mongooseFunctions')
 
 const getUserByNickname = (req, res, next) => {
     const nickname = req.params.nickname
@@ -30,14 +31,7 @@ const getUserByNickname = (req, res, next) => {
 }
 
 const findOneAndUpdate = async (nickname, changesObj, res) => {
-    await User.findOneAndUpdate({ nickname: nickname }, changesObj, (error, user) => {
-        if (error) {
-            return dbErrors.sendErrorsFromDB(res, error)
-        }
-        else {
-            return res.status(200).json({ message: 'Informações alteradas com sucesso', data: user })
-        }
-    })
+    return await mongooseFunctions.findOneAndUpdate(User, { nickname: nickname }, changesObj, res)
 }
 
 const updateDifferentNickname = async (nickname, changesObj, res) => {
