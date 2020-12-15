@@ -26,8 +26,9 @@ module.exports = function (server) {
 	protectedApi.get('/friendshipRequest/nickname/:nickname', FriendshipRequest.getFriendshipRequests)
 	protectedApi.get('/friendshipRequest/:id', FriendshipRequest.getFriendshipRequestById)
 	protectedApi.post('/friendshipRequest', FriendshipRequest.sendFriendshipRequest)
-	protectedApi.delete('/friendshipRequest/:id', FriendshipRequest.cancelFriendshipRequest)
+	protectedApi.delete('/friendshipRequest/:id', FriendshipRequest.cancelFriendship)
 	protectedApi.put('/friendshipRequest/:id', FriendshipRequest.acceptFriendshipRequest)
+	protectedApi.get('/friendships/:nickname', FriendshipRequest.getFriendship)
 	
 	/*
 	* Rotas abertas

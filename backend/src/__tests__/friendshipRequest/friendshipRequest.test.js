@@ -178,8 +178,8 @@ describe('FriendshipRequest routes tests', () => {
         })
     })
 
-    describe('cancelFriendshipRequest', () => {
-        it ('cancelFriendshipRequest successfully', async () => {
+    describe('cancelFriendship', () => {
+        it ('cancelFriendship successfully', async () => {
             await utils.signUp(200, fakeFooUser)
             await utils.signUp(200, fakeBarUser)
             const loginResponse = await utils.login(fakeFooUser.email, fakeFooUser.password)
@@ -188,10 +188,10 @@ describe('FriendshipRequest routes tests', () => {
             const sendResponse = await request(server).get(`/api/friendshipRequest/nickname/${fakeBarUser.nickname}`)
                 .set('authorization', loginResponseToken)
                 .expect(200)
-            await friendshipRequestTestUtils.cancelFriendshipRequest(sendResponse.body.friendshipRequests[0]._id, loginResponseToken, 200, 'Solicitação de amizade cancelada com sucesso', '')
+            await friendshipRequestTestUtils.cancelFriendship(sendResponse.body.friendshipRequests[0]._id, loginResponseToken, 200, 'Amizade cancelada com sucesso', '')
         })
 
-        it ('cancelFriendshipRequest fail - missing id', async () => {
+        it ('cancelFriendship fail - missing id', async () => {
             await utils.signUp(200, fakeFooUser)
             await utils.signUp(200, fakeBarUser)
             const loginResponse = await utils.login(fakeFooUser.email, fakeFooUser.password)
@@ -200,10 +200,10 @@ describe('FriendshipRequest routes tests', () => {
             const sendResponse = await request(server).get(`/api/friendshipRequest/nickname/${fakeBarUser.nickname}`)
                 .set('authorization', loginResponseToken)
                 .expect(200)
-            await friendshipRequestTestUtils.cancelFriendshipRequest('', loginResponseToken, 404)
+            await friendshipRequestTestUtils.cancelFriendship('', loginResponseToken, 404)
         })
 
-        it ('cancelFriendshipRequest fail - wrong id', async () => {
+        it ('cancelFriendship fail - wrong id', async () => {
             await utils.signUp(200, fakeFooUser)
             await utils.signUp(200, fakeBarUser)
             const loginResponse = await utils.login(fakeFooUser.email, fakeFooUser.password)
@@ -212,7 +212,7 @@ describe('FriendshipRequest routes tests', () => {
             const sendResponse = await request(server).get(`/api/friendshipRequest/nickname/${fakeBarUser.nickname}`)
                 .set('authorization', loginResponseToken)
                 .expect(200)
-            await friendshipRequestTestUtils.cancelFriendshipRequest('test', loginResponseToken, 400, '', 'Cast to ObjectId failed for value "test" at path "_id" for model "FriendshipRequest"')
+            await friendshipRequestTestUtils.cancelFriendship('test', loginResponseToken, 400, '', 'Cast to ObjectId failed for value "test" at path "_id" for model "FriendshipRequest"')
         })
     })
 
@@ -254,6 +254,52 @@ describe('FriendshipRequest routes tests', () => {
                 .set('authorization', loginResponse.body.token)
                 .expect(200)
             await friendshipRequestTestUtils.acceptFriendshipRequest(sendResponse.body.friendshipRequests[0]._id, loginResponse.body.token, 400, { status: '' }, '', 'Parâmetros não foram fornecidos corretamente')
+        })
+    })
+
+    describe('getFriendship', () => {
+        it ('getFriendship successfully', async () => {
+            let loginResponse
+            await utils.signUp(200, fakeFooUser)
+            await utils.signUp(200, fakeBarUser)
+            loginResponse = await utils.login(fakeFooUser.email, fakeFooUser.password)
+            await friendshipRequestTestUtils.sendFriendshipRequest(fakeBarUser.nickname, fakeFooUser.nickname, loginResponse.body.token, 200)
+            loginResponse = await utils.login(fakeBarUser.email, fakeBarUser.password)
+            const sendResponse = await request(server).get(`/api/friendshipRequest/nickname/${fakeBarUser.nickname}`)
+                .set('authorization', loginResponse.body.token)
+                .expect(200)
+            await friendshipRequestTestUtils.acceptFriendshipRequest(sendResponse.body.friendshipRequests[0]._id, loginResponse.body.token, 200, { status: 'accepted' }, 'Informações alteradas com sucesso', '')
+            const getFriendshipResponse = await friendshipRequestTestUtils.getFriendship(fakeBarUser.nickname, loginResponse.body.token, 200)
+            expect(getFriendshipResponse.body.friendshipRequests.length).toEqual(1)
+        })
+
+        it ('getFriendship successfully - target view', async () => {
+            let loginResponse
+            await utils.signUp(200, fakeFooUser)
+            await utils.signUp(200, fakeBarUser)
+            loginResponse = await utils.login(fakeFooUser.email, fakeFooUser.password)
+            await friendshipRequestTestUtils.sendFriendshipRequest(fakeBarUser.nickname, fakeFooUser.nickname, loginResponse.body.token, 200)
+            loginResponse = await utils.login(fakeBarUser.email, fakeBarUser.password)
+            const sendResponse = await request(server).get(`/api/friendshipRequest/nickname/${fakeBarUser.nickname}`)
+                .set('authorization', loginResponse.body.token)
+                .expect(200)
+            await friendshipRequestTestUtils.acceptFriendshipRequest(sendResponse.body.friendshipRequests[0]._id, loginResponse.body.token, 200, { status: 'accepted' }, 'Informações alteradas com sucesso', '')
+            const getFriendshipResponse = await friendshipRequestTestUtils.getFriendship(fakeFooUser.nickname, loginResponse.body.token, 200)
+            expect(getFriendshipResponse.body.friendshipRequests.length).toEqual(1)
+        })
+
+        it ('getFriendship successfully - no friendship found', async () => {
+            let loginResponse
+            await utils.signUp(200, fakeFooUser)
+            await utils.signUp(200, fakeBarUser)
+            loginResponse = await utils.login(fakeFooUser.email, fakeFooUser.password)
+            await friendshipRequestTestUtils.sendFriendshipRequest(fakeBarUser.nickname, fakeFooUser.nickname, loginResponse.body.token, 200)
+            loginResponse = await utils.login(fakeBarUser.email, fakeBarUser.password)
+            const sendResponse = await request(server).get(`/api/friendshipRequest/nickname/${fakeBarUser.nickname}`)
+                .set('authorization', loginResponse.body.token)
+                .expect(200)
+            const getFriendshipResponse = await friendshipRequestTestUtils.getFriendship(fakeFooUser.nickname, loginResponse.body.token, 200)
+            expect(getFriendshipResponse.body.message).toEqual('Nenhuma amizade encontrada')
         })
     })
 })

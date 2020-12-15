@@ -56,14 +56,14 @@ const sendFriendshipRequest = async (req, res, next) => {
     })
 }
 
-const cancelFriendshipRequest = async (req, res, next) => {
+const cancelFriendship = async (req, res, next) => {
     const friendshipRequestId = req.params.id || ''
 
     FriendshipRequest.deleteOne({ '_id': friendshipRequestId }, (errors) => {
         if (errors)
             return dbErrors.sendErrorsFromDB(res, errors)
         else
-            return res.status(200).json({ message: 'Solicitação de amizade cancelada com sucesso' })
+            return res.status(200).json({ message: 'Amizade cancelada com sucesso' })
     })
 }
 
@@ -77,4 +77,18 @@ const acceptFriendshipRequest = async (req, res, next) => {
     return await mongooseFunctions.findOneAndUpdate(FriendshipRequest, { '_id': friendshipRequestId }, { status: newStatus }, res)
 }
 
-module.exports = { getFriendshipRequests, getFriendshipRequestById, sendFriendshipRequest, cancelFriendshipRequest, acceptFriendshipRequest }
+const getFriendship = async (req, res, next) => {
+    const nickname = req.params.nickname
+    const query = { $and: [ { status: 'accepted' }, { $or: [{ targetUserNickname: nickname }, { requesterUserNickname: nickname }] }]}
+
+    FriendshipRequest.find(query, (error, friendshipRequests) => {
+        if (!friendshipRequests || friendshipRequests.length <= 0) {
+            return res.status(200).json({ message: 'Nenhuma amizade encontrada' })
+        }
+        else {
+            return res.status(200).json({ friendshipRequests })
+        }
+    })
+}
+
+module.exports = { getFriendshipRequests, getFriendshipRequestById, sendFriendshipRequest, cancelFriendship, acceptFriendshipRequest, getFriendship }

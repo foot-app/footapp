@@ -5,6 +5,8 @@ import { bindActionCreators } from 'redux'
 import { searchUsers } from './socialActions'
 import SocialSearchBar from './socialSearchBar'
 import SocialSearchedUserInfo from './socialSearchedUserInfo'
+import SocialFriendsList from './socialFriendsList'
+import SocialPendingFriendshipRequests from './socialPendingFriendshipRequests'
 
 class Social extends Component {
     render() {
@@ -12,6 +14,8 @@ class Social extends Component {
             <div id='social-content' className='container'>
                 <SocialSearchBar />
                 <SocialSearchedUserInfo />
+                <SocialFriendsList />
+                <SocialPendingFriendshipRequests />
             </div>
         )
     }

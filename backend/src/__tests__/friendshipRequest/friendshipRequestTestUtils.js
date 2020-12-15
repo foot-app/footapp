@@ -14,7 +14,7 @@ const sendFriendshipRequest = async (targetUserNickname, requesterUserNickname, 
         })
 }
 
-const cancelFriendshipRequest = async (id, token, statusCode, responseMessage, responseError) => {
+const cancelFriendship = async (id, token, statusCode, responseMessage, responseError) => {
     await request(server).delete(`/api/friendshipRequest/${id}`)
         .set('authorization', token)
         .expect(statusCode)
@@ -39,4 +39,10 @@ const acceptFriendshipRequest = async (id, token, statusCode, changeObj, respons
         })
 }
 
-module.exports = { sendFriendshipRequest, cancelFriendshipRequest, acceptFriendshipRequest }
+const getFriendship = async (nickname, token, statusCode) => {
+    return await request(server).get(`/api/friendships/${nickname}`)
+        .set('authorization', token)
+        .expect(statusCode)
+}
+
+module.exports = { sendFriendshipRequest, cancelFriendship, acceptFriendshipRequest, getFriendship }

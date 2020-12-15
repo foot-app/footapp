@@ -54,6 +54,26 @@ describe('ProfileEdit components tests', () => {
         })
     }
 
+    const createFriendshipRequest = (targetUserNickname, requesterUserNickname, targetUserEmail, targetUserPassword) => {
+        cy.request({
+            method: 'POST', 
+            url: 'http://localhost:3003/oapi/user/login', 
+            body: { email: targetUserEmail, password: targetUserPassword },
+        }).then(response => {
+            expect(response.status).to.eq(200)
+            cy.request({
+                method: 'POST', 
+                url: 'http://localhost:3003/api/friendshipRequest', 
+                body: { targetUserNickname: targetUserNickname, requesterUserNickname: requesterUserNickname },
+                headers: {
+                    authorization: response.body.token
+                }
+            }).then(response => {
+                expect(response.status).to.eq(200)
+            })
+        })
+    }
+
     it ('renders successfully', () => {
         cy.get('[data-test-id=userSearch]').should('have.value', '')
         cy.get('[data-test-id=info-img]').should('have.attr', 'src').should('equal', '')
@@ -105,6 +125,76 @@ describe('ProfileEdit components tests', () => {
             cy.get('[data-test-id=info-nickname]').should('have.text', '')
             cy.get('[data-test-id=info-positions]').should('have.text', 'Fut7:  | Futsal: ')
             cy.get('[data-test-id=userSearch]').should('have.value', '')
+        })
+    })
+
+    describe('send friendship request tests', () => {
+        it ('send friendship request successfully' , () => {
+            createBarUser()
+            cy.get('[data-test-id=userSearch]').type('Bar Bearer')
+            cy.get('[data-test-id=userSearch-list]').find('li').click()
+            cy.wait(500)
+            cy.get('[data-test-id=sendSolicitation-button]').click()
+            cy.wait(500)
+            cy.get('.toastr.animated.success')
+        })
+        
+        it ('send friendship request fail - friendship request already sent' , () => {
+            createBarUser()
+            cy.get('[data-test-id=userSearch]').type('Bar Bearer')
+            cy.get('[data-test-id=userSearch-list]').find('li').click()
+            cy.wait(500)
+            cy.get('[data-test-id=sendSolicitation-button]').click()
+            cy.wait(500)
+            cy.get('.toastr.animated.success')
+            cy.get('[data-test-id=userSearch]').type('Bar Bearer')
+            cy.get('[data-test-id=userSearch-list]').find('li').click()
+            cy.wait(500)
+            cy.get('[data-test-id=sendSolicitation-button]').click()
+            cy.wait(500)
+            cy.get('.toastr.animated.error')
+        })
+    })
+
+    describe('accept friendship request tests', () => {
+        it ('accept friendship request successfully', () => {
+            createBarUser()
+            createFriendshipRequest('foo123', 'bar123', 'foo@foo.com.br', 'Foo@123!')
+            cy.wait(1000)
+            cy.reload()
+            cy.wait(1000)
+            cy.get('[data-test-id=acceptPendingFriendshipRequest-0]').click()
+            cy.wait(500)
+            cy.get('.toastr.animated.success')
+        })
+
+        it ('refuse friendship request successfully', () => {
+            createBarUser()
+            createFriendshipRequest('foo123', 'bar123', 'foo@foo.com.br', 'Foo@123!')
+            cy.wait(1000)
+            cy.reload()
+            cy.wait(1000)
+            cy.get('[data-test-id=refusePendingFriendshipRequest-0]').click()
+            cy.wait(500)
+            cy.get('.toastr.animated.success')
+        })
+    })
+
+    describe('friendship tests', () => {
+        it ('cancel friendship successfully', () => {
+            createBarUser()
+            createFriendshipRequest('foo123', 'bar123', 'foo@foo.com.br', 'Foo@123!')
+            cy.wait(1000)
+            cy.reload()
+            cy.wait(1000)
+            cy.get('[data-test-id=acceptPendingFriendshipRequest-0]').click()
+            cy.wait(500)
+            cy.get('.toastr.animated.success')
+            cy.reload()
+            cy.wait(1000)
+            cy.get('[data-test-id=cancelFriendship-0]').click()
+            cy.wait(500)
+            cy.get('.toastr.animated.success')
         })
     })
 })

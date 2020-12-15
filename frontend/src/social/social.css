@@ -9,6 +9,9 @@
 #social-content #searchedUser-info-row .searchedUser-info-div { display: flex; flex-direction: column; justify-content: center; align-items: center; }
 #social-content #searchedUser-info-row .searchedUser-button-div { display: flex; flex-direction: row; justify-content: center; align-items: center; }
 #social-content #searchedUser-info-row .searchedUser-button-div button { margin: 5px; }
+#social-content fieldset { border: solid 1px #b1f900; padding: 30px; margin-top: 40px; }
+#social-content fieldset legend { color: #b1f900; width: 200px; }
+#social-content #friendsList-row .pendingFriendshipRequests-actions button { margin: 5px; }
 
 @media (max-width: 576px) {
     #social-content #searchedUser-info-row img { width: 50%; }
