@@ -7,8 +7,16 @@ import SocialSearchBar from './socialSearchBar'
 import SocialSearchedUserInfo from './socialSearchedUserInfo'
 import SocialFriendsList from './socialFriendsList'
 import SocialPendingFriendshipRequests from './socialPendingFriendshipRequests'
+import { getFriendship, getPendingFriendshipRequests } from './socialActions'
 
 class Social extends Component {
+    constructor(props) {
+        super(props)
+
+        this.props.getFriendship(this.props.auth.user.nickname)
+        this.props.getPendingFriendshipRequests(this.props.auth.user.nickname)
+    }
+
     render() {
         return (
             <div id='social-content' className='container'>
@@ -21,6 +29,11 @@ class Social extends Component {
     }
 }
 
-const mapStateToProps = state => ({ social: state.social })
-const mapDispatchToProps = dispatch => bindActionCreators({ searchUsers } , dispatch)
+const mapStateToProps = state => ({
+    social: state.social,
+    auth: state.auth
+})
+const mapDispatchToProps = dispatch => bindActionCreators({
+    searchUsers, getFriendship, getPendingFriendshipRequests
+} , dispatch)
 export default connect(mapStateToProps, mapDispatchToProps)(Social)

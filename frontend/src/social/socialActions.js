@@ -70,16 +70,20 @@ export const getPendingFriendshipRequests = nickname => {
     }
 }
 
+const showToastAndDispatch = (dispatch, nickname, response) => {
+    if (response.data.message) {
+        toastr.success('', response.data.message)
+    }
+
+    dispatch(getPendingFriendshipRequests(nickname))
+    dispatch(getFriendship(nickname))
+}
+
 export const cancelFriendship = (id, targetUserNickname) => {
     return dispatch => {
         axios.delete(`${consts.API_URL}/friendshipRequest/${id}`)
             .then(response => {
-                if (response.data.message) {
-                    toastr.success('', response.data.message)
-                }
-
-                dispatch(getPendingFriendshipRequests(targetUserNickname))
-                dispatch(getFriendship(targetUserNickname))
+                showToastAndDispatch(dispatch, targetUserNickname, response)
             })
             .catch(e => {
                 e.response.data.errors.forEach(error => toastr.error('Erro', error))
@@ -91,12 +95,7 @@ export const acceptPendingFriendshipRequest = (id, targetUserNickname) => {
     return dispatch => {
         axios.put(`${consts.API_URL}/friendshipRequest/${id}`, { status: 'accepted' })
             .then(response => {
-                if (response.data.message) {
-                    toastr.success('', response.data.message)
-                }
-    
-                dispatch(getPendingFriendshipRequests(targetUserNickname))
-                dispatch(getFriendship(targetUserNickname))
+                showToastAndDispatch(dispatch, targetUserNickname, response)
             })
             .catch(e => {
                 e.response.data.errors.forEach(error => toastr.error('Erro', error))

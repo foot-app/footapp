@@ -13,4 +13,15 @@ const friendshipRequestExists = async (targetUserNickname, requesterUserNickname
     return !!friendshipRequest
 }
 
-module.exports = { findUser, friendshipRequestExists }
+const findFriendshipRequest = async (query, noneFoundMessage, res) => {
+    await FriendshipRequest.find(query, (error, friendshipRequests) => {
+        if (!friendshipRequests || friendshipRequests.length <= 0) {
+            return res.status(200).json({ message: noneFoundMessage })
+        }
+        else {
+            return res.status(200).json({ friendshipRequests })
+        }
+    })
+}
+
+module.exports = { findUser, friendshipRequestExists, findFriendshipRequest }

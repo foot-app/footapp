@@ -4,15 +4,9 @@ import { bindActionCreators } from 'redux'
 
 import Grid from '../common/layout/grid'
 import Row from '../common/layout/row'
-import { getPendingFriendshipRequests, cancelFriendship, acceptPendingFriendshipRequest } from './socialActions'
+import { cancelFriendship, acceptPendingFriendshipRequest } from './socialActions'
 
-class SocialFriendsList extends Component {
-    constructor(props) {
-        super(props)
-
-        this.props.getPendingFriendshipRequests(this.props.auth.user.nickname)
-    }
-    
+class SocialFriendsList extends Component {    
     render() {
         const { pendingFriendshipRequests } = this.props.social
 
@@ -49,6 +43,6 @@ const mapStateToProps = state => ({
     auth: state.auth 
 })
 const mapDispatchToProps = dispatch => bindActionCreators({ 
-    getPendingFriendshipRequests, cancelFriendship, acceptPendingFriendshipRequest
+    cancelFriendship, acceptPendingFriendshipRequest
 } , dispatch)
 export default connect(mapStateToProps, mapDispatchToProps)(SocialFriendsList)

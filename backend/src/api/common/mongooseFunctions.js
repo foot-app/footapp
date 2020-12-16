@@ -11,4 +11,14 @@ const findOneAndUpdate = async (Model, queryObj, changeObj, res) => {
     })
 }
 
-module.exports = { findOneAndUpdate }
+const save = async (model, successMessage, res) => {
+    await model.save(async err => {
+        if (err) {
+            return dbErrors.sendErrorsFromDB(res, err)
+        } else {
+            return res.status(200).json({ message: successMessage })
+        }
+    })
+}
+
+module.exports = { findOneAndUpdate, save }

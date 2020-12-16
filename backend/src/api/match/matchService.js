@@ -1,7 +1,8 @@
 const _ = require('lodash')
 const Match = require('./match');
 const dbErrors = require('../common/sendErrorsFromDb')
-const changesObjUtils = require('../common/populateChangesObj')
+const changesObjUtils = require('../common/populateChangesObj');
+const mongooseFunctions = require('../common/mongooseFunctions');
 
 const createMatch = async (req, res, next) => {
     const changesObj = {}
@@ -19,14 +20,7 @@ const createMatch = async (req, res, next) => {
     }
 
     const newMatch = new Match(Object.assign({}, changesObj));
-    newMatch.save(err => {
-        if(err) {
-            return dbErrors.sendErrorsFromDB(res, err)
-        }
-        else {
-            return res.status(200).json({ message: 'Partida cadastrada com sucesso!' })
-        }
-    })
+    return await mongooseFunctions.save(newMatch, 'Partida cadastrada com sucesso!', res)
 }
 
 const listMyMatches = async (req, res, next) => {

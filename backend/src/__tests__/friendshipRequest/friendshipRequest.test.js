@@ -160,13 +160,13 @@ describe('FriendshipRequest routes tests', () => {
         it ('sendFriendshipRequest fail - targetUser does not exist', async () => {
             await utils.signUp(200, fakeFooUser)
             const loginResponse = await utils.login(fakeFooUser.email, fakeFooUser.password)
-            await friendshipRequestTestUtils.sendFriendshipRequest(fakeBarUser.nickname, fakeFooUser.nickname, loginResponse.body.token, 400, '', 'Usuário para quem está enviando a solicitação não foi encontrado')
+            await friendshipRequestTestUtils.sendFriendshipRequest(fakeBarUser.nickname, fakeFooUser.nickname, loginResponse.body.token, 400, '', 'Usuários informados não foram encontrados')
         })
 
         it ('sendFriendshipRequest fail - requesterUser does not exist', async () => {
             await utils.signUp(200, fakeBarUser)
             const loginResponse = await utils.login(fakeBarUser.email, fakeBarUser.password)
-            await friendshipRequestTestUtils.sendFriendshipRequest(fakeBarUser.nickname, fakeFooUser.nickname, loginResponse.body.token, 400, '', 'Usuário solicitante não foi encontrado')
+            await friendshipRequestTestUtils.sendFriendshipRequest(fakeBarUser.nickname, fakeFooUser.nickname, loginResponse.body.token, 400, '', 'Usuários informados não foram encontrados')
         })
 
         it ('sendFriendshipRequest fail - FriendshipRequest already sent', async () => {
