@@ -1,0 +1,27 @@
+#table-title {
+    text-align: center;
+    font-family: arial, sans-serif;
+    color: #ddd;
+}
+
+#public-matches-table {
+    text-align: center;
+    border-collapse: collapse;
+    border: 3px solid #ddd;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+#public-matches-table td, #public-matches-table th {
+    border-bottom: 1px solid #ddd;
+    padding: 8px;
+    color: white;
+}
+
+#public-matches-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    background-color: gray;
+    color: white;
+  }

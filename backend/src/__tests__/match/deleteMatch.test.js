@@ -9,7 +9,7 @@ const match = require('../../api/match/match')
 let app
 
 const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' }
-const fakeMatch = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false', creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' }
+const fakeMatch = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false', creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste', isAPrivateMatch: false }
 
 const createUserAndLogin = () => {
     return new Promise(async resolve => {

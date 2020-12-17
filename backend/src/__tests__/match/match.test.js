@@ -5,7 +5,7 @@ const User = require('../../api/user/user')
 const server = require('../../loader')
 let app
 
-const fakeMatch = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste' }
+const fakeMatch = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste', isAPrivateMatch: false }
 const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' }
 
 const createUserAndLogin = () => {
@@ -96,7 +96,7 @@ describe('match routes test', () => {
     describe('match create tests', () => {
         it('can create match', async() => {
             const token  = await createUserAndLogin();
-            const bodyRequisition = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste', schedule: '13:30'}
+            const bodyRequisition = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'nickteste', schedule: '13:30', isAPrivateMatch: false}
             const res = await sendCreateMatchRequisition(token, bodyRequisition)
             expect(res.status).toEqual(200)
         })
@@ -145,7 +145,7 @@ describe('match routes test', () => {
 
         it('can\'t create match - wrong format date', async() => {
             const token  = await createUserAndLogin();
-            const bodyRequisition = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'a', city: 'a', state: 'a', date: 'a', ownerNickname: 'nickteste' }
+            const bodyRequisition = { name: 'partidaTeste', rentAmount: '500', matchType: 'fut7', creatorHasBall: 'false',creatorHasVest: 'false', goalkeeperPays: 'false', street: 'a', number: '1', neighborhood: 'a', city: 'a', state: 'a', date: 'a', ownerNickname: 'nickteste', isAPrivateMatch: false }
             const res = await sendCreateMatchRequisition(token, bodyRequisition)
             expect(res.status).toEqual(400)
         })

@@ -67,7 +67,7 @@ describe('my match routes test', () => {
     describe('list my matches tests', () => {
         it('can list my matches - one match registered ', async() => {
             const token = await createUserAndLogin();
-            const bodyRequisition = { name: 'partidaTeste', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'foo123'}
+            const bodyRequisition = { name: 'partidaTeste', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'foo123', isAPrivateMatch: false }
             const res = await sendCreateMatchRequisition(token, bodyRequisition)
             await request(server).get('/api/matches/foo123')
                 .set('authorization', token)
@@ -75,7 +75,7 @@ describe('my match routes test', () => {
                     expect(response.body).toEqual(
                         expect.arrayContaining([
                             expect.objectContaining({
-                                name: 'partidaTeste', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: 1, neighborhood: 'b', city: 'c', state: 'c', ownerNickname: 'foo123'
+                                name: 'partidaTeste', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: 1, neighborhood: 'b', city: 'c', state: 'c', ownerNickname: 'foo123', isAPrivateMatch: false
                             })
                         ])
                     )
@@ -84,9 +84,9 @@ describe('my match routes test', () => {
 
          it('can list my matches - more than one registered', async() => {
             const token = await createUserAndLogin();
-            const bodyRequisition = { name: 'partidaTeste', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'foo123'}
+            const bodyRequisition = { name: 'partidaTeste', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'foo123', isAPrivateMatch: false}
             const res = await sendCreateMatchRequisition(token, bodyRequisition)
-            const bodyRequisition2 = { name: 'partidaTeste2', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'foo123'}
+            const bodyRequisition2 = { name: 'partidaTeste2', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: '1', neighborhood: 'b', city: 'c', state: 'c', date: new Date(2020,11, 12,19,30,0), ownerNickname: 'foo123', isAPrivateMatch: false}
             const res2 = await sendCreateMatchRequisition(token, bodyRequisition2)
             await request(server).get('/api/matches/foo123')
                 .set('authorization', token)
@@ -94,10 +94,10 @@ describe('my match routes test', () => {
                     expect(response.body).toEqual(
                         expect.arrayContaining([
                             expect.objectContaining({
-                                name: 'partidaTeste', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: 1, neighborhood: 'b', city: 'c', state: 'c', ownerNickname: 'foo123'
+                                name: 'partidaTeste', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: 1, neighborhood: 'b', city: 'c', state: 'c', ownerNickname: 'foo123', isAPrivateMatch: false
                             }),
                             expect.objectContaining({
-                                name: 'partidaTeste2', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: 1, neighborhood: 'b', city: 'c', state: 'c', ownerNickname: 'foo123'
+                                name: 'partidaTeste2', rentAmount: 500, matchType: 'fut7', creatorHasBall: false, creatorHasVest: false, goalkeeperPays: false, street: 'a', number: 1, neighborhood: 'b', city: 'c', state: 'c', ownerNickname: 'foo123', isAPrivateMatch: false
                             })
                         ])
                     )

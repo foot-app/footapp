@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
     preferredFoot: { type: String, enum: ['Direito', 'Esquerdo', 'Ambos'] },
     profilePicture: { type: String },
     fut7Positions: [String],
-    futsalPositions: [String]
+    futsalPositions: [String],
+    matches: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Match' }]
 })
 
 module.exports = restful.model('User', userSchema)

@@ -35,6 +35,7 @@ class MatchCreateForm extends Component {
                         <Row>
                             <SelectMatchCreateForm cols='12 4' name='creatorHasVest' label='Criador possui coletes?' options={[{ value: 'false', text: 'Não possui' }, { value: 'true', text: 'Possui' }]} />
                             <SelectMatchCreateForm cols='12 4' name='goalkeeperPays' label='Goleiro paga?' options={[{ value: 'false', text: 'Não' }, { value: 'true', text: 'Sim' }]} />
+                            <SelectMatchCreateForm cols='12 4' name='isAPrivateMatch' label='Partida é privada?' options={[{ value: 'false', text: 'Não' }, { value: 'true', text: 'Sim' }]} />
                         </Row>
                     </div>
                 </fieldset>
@@ -51,6 +52,6 @@ MatchCreateForm = reduxForm({
     destroyOnUnmount: false
 })(MatchCreateForm)
 
-const mapStateToProps = state => ({initialValues: {matchType: 'fut7', creatorHasVest: 'false', creatorHasBall: 'false', goalkeeperPays: 'false'}})
+const mapStateToProps = state => ({initialValues: {matchType: 'fut7', creatorHasVest: 'false', creatorHasBall: 'false', goalkeeperPays: 'false', isAPrivateMatch: 'false'}})
 const mapDispatchToProps = dispatch => bindActionCreators({ resetForm } , dispatch)
 export default connect(mapStateToProps, mapDispatchToProps)(MatchCreateForm)

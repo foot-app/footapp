@@ -21,6 +21,10 @@ module.exports = function (server) {
 	protectedApi.get('/matches/:nickname', Match.listMyMatches)
 	protectedApi.delete('/match/delete/:id', Match.deleteMatch)
 
+	const PublicMatches = require('../api/publicMatches/publicMatchesService');
+	protectedApi.get('/publicMatches/list', PublicMatches.listPublicMatches);
+	protectedApi.post('/publicMatches/join', PublicMatches.joinPublicMatch);
+
 	
 	/*
 	* Rotas abertas
