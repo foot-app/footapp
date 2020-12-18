@@ -2,6 +2,7 @@ const User = require('./user')
 const dbErrors = require('../common/sendErrorsFromDb')
 const changesObjUtils = require('../common/populateChangesObj')
 const mongooseFunctions = require('../common/mongooseFunctions')
+const userServiceUtils = require('./userServiceUtils')
 
 const getUserByNickname = (req, res, next) => {
     const nickname = req.params.nickname
@@ -51,6 +52,7 @@ const updateDifferentNickname = async (nickname, changesObj, res) => {
                     return res.status(400).json({ errors: ['Usuário não encontrado'] })
                 }
                 else {
+                    await userServiceUtils.updateFriendshipRequestsNickname(nickname, changesObj.nickname)
                     return await findOneAndUpdate(nickname, changesObj, res) 
                 }
             })

@@ -2,8 +2,10 @@ const utils = require('../utils')
 const request = require('supertest')
 const User = require('../../api/user/user')
 const server = require('../../loader')
+const friendshipRequestTestUtils = require('../friendshipRequest/friendshipRequestTestUtils')
 let app
 
+const fakeFooUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' }
 const fakeUser = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', height: '170', weight: '70.0', preferredFoot: 'Direito', profilePicture: 'https://foo.com.br/image.png', fut7Positions: ['gk', 'zc'], futsalPositions: ['gk'] }
 const fakeUserSignup = { name: 'foo', email: 'foo@foo.com', nickname: 'foo123', password: 'Foo@123!', confirm_password: 'Foo@123!' }
 const fakeBarUser = { name: 'bar', email: 'bar@bar.com', nickname: 'bar123', password: 'Bar@123!', confirm_password: 'Bar@123!' }
@@ -210,6 +212,39 @@ describe('user routes tests', () => {
         }
 
         it ('can updateUser', async () => {
+            await utils.signUp(200, fakeFooUser)
+            await utils.signUp(200, fakeBarUser)
+            const loginResponse = await utils.login(fakeFooUser.email, fakeFooUser.password)
+            await friendshipRequestTestUtils.sendFriendshipRequest(fakeBarUser.nickname, fakeFooUser.nickname, loginResponse.body.token, 200)
+            await request(server).put(`/api/user/${fakeBarUser.nickname}`)
+                .set('authorization', loginResponse.body.token)
+                .send({ nickname: 'bar1234' , height: 170, weight: 70, preferredFoot: 'Direito', profilePicture: 'https://bar.com.br/image.png', fut7Positions: ['gk', 'zc'], futsalPositions: ['gk'] })
+                .expect(200)
+            await request(server).get('/api/user/bar1234')
+                .set('authorization', loginResponse.body.token)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.userData.height).toEqual(170)
+                    expect(response.body.userData.weight).toEqual(70)
+                    expect(response.body.userData.preferredFoot).toEqual('Direito')
+                    expect(response.body.userData.profilePicture).toEqual('https://bar.com.br/image.png')
+                    expect(response.body.userData.nickname).toEqual('bar1234')
+                })
+            await request(server).get(`/api/friendshipRequest/nickname/${fakeBarUser.nickname}`)
+                .set('authorization', loginResponse.body.token)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.message).toEqual('Nenhuma solicitação de amizade encontrada')
+                })
+            await request(server).get(`/api/friendshipRequest/nickname/bar1234`)
+                .set('authorization', loginResponse.body.token)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.friendshipRequests.length).toEqual(1)
+                })
+        })
+
+        it ('can updateUser and friendship request was updated', async () => {
             const response = await autoSignupAndLogin(fakeUserSignup)
             await updateUser(response.body.token, 'foo123', 200)
             await request(server).get('/api/user/foo123')
