@@ -1,6 +1,8 @@
 const User = require('./user')
 const dbErrors = require('../common/sendErrorsFromDb')
 const changesObjUtils = require('../common/populateChangesObj')
+const mongooseFunctions = require('../common/mongooseFunctions')
+const userServiceUtils = require('./userServiceUtils')
 
 const getUserByNickname = (req, res, next) => {
     const nickname = req.params.nickname
@@ -30,14 +32,7 @@ const getUserByNickname = (req, res, next) => {
 }
 
 const findOneAndUpdate = async (nickname, changesObj, res) => {
-    await User.findOneAndUpdate({ nickname: nickname }, changesObj, (error, user) => {
-        if (error) {
-            return dbErrors.sendErrorsFromDB(res, error)
-        }
-        else {
-            return res.status(200).json({ message: 'Informações alteradas com sucesso', data: user })
-        }
-    })
+    return await mongooseFunctions.findOneAndUpdate(User, { nickname: nickname }, changesObj, res)
 }
 
 const updateDifferentNickname = async (nickname, changesObj, res) => {
@@ -57,6 +52,7 @@ const updateDifferentNickname = async (nickname, changesObj, res) => {
                     return res.status(400).json({ errors: ['Usuário não encontrado'] })
                 }
                 else {
+                    await userServiceUtils.updateFriendshipRequestsNickname(nickname, changesObj.nickname)
                     return await findOneAndUpdate(nickname, changesObj, res) 
                 }
             })
@@ -93,4 +89,18 @@ const updateUser = async (req, res, next) => {
     }
 }
 
-module.exports = { getUserByNickname, updateUser }
+const getUsersByQuery = async (req, res, next) => {
+    const value = req.params.value || ''
+    const valueExp = new RegExp(value, 'i')
+    const query = { $or: [{ name: valueExp }, { email: valueExp }, { nickname: valueExp }]}
+    User.find(query, (error, users) => {
+        if (!users || users.length <= 0) {
+            return res.status(200).json({ errors: ['Nenhum usuário não encontrado'] })
+        }
+        else {
+            return res.status(200).json({ users })
+        }
+    })
+}
+
+module.exports = { getUserByNickname, updateUser, getUsersByQuery }
